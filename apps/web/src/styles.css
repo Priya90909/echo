@@ -1,0 +1,8 @@
+body {
+  margin: 0;
+  font-family: system-ui, sans-serif;
+  color: #ecf1ed;
+  background: #101413;
+}
+main { max-width: 48rem; margin: 5rem auto; padding: 1.5rem; }
+h1 { color: #b7e4a5; letter-spacing: .15em; }
