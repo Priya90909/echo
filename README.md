@@ -4,7 +4,7 @@ A music app built with React, JavaScript, Vite and Express.
 
 ## Current progress
 
-Stage 1: project foundation. This version includes npm workspaces, JavaScript ES modules, a minimal React page and an API health endpoint.
+Stage 2: visual shell and navigation. Includes the landing page, responsive sidebar, top bar, reusable UI components and routes with placeholder content. Stage 1 workspace setup and the API health endpoint remain available.
 
 ## Run locally
 
@@ -27,4 +27,4 @@ The API uses port 4000 by default. Optional local configuration can be copied fr
 npm run build
 ```
 
-This stage has no database, login, song catalog or music playback yet. Those features will be added in later stages. Local environment files, dependencies and generated builds are excluded from Git.
+Navigation and page layouts work; account screens and music pages currently show placeholders. This stage has no database, login, song catalog or music playback yet. Those features will be added in later stages. Local environment files, dependencies and generated builds are excluded from Git.
