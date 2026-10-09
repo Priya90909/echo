@@ -1,10 +1,10 @@
 # ECHO
 
-A music app built with React, TypeScript, Vite and Express.
+A music app built with React, JavaScript, Vite and Express.
 
 ## Current progress
 
-Stage 1: project foundation. This version includes npm workspaces, shared TypeScript configuration, a minimal React page and an API health endpoint.
+Stage 1: project foundation. This version includes npm workspaces, JavaScript ES modules, a minimal React page and an API health endpoint.
 
 ## Run locally
 

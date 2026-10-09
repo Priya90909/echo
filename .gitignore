@@ -3,7 +3,6 @@ dist/
 .env
 .env.*
 !.env.example
-*.tsbuildinfo
 .npm-cache/
 work/
 data/
