@@ -26,7 +26,7 @@ export function Cards({ tracks = [] }) {
   return <div className="song-grid">{tracks.map(track => <article className="song-card" key={track._id}>
     <img src={track.cover ?? "/covers/ambient.svg"} alt={`Artwork for ${track.title}`} loading="lazy" />
     <h3>{track.title}</h3><Link to={`/artists/${track.artist._id}`}>{track.artist.name}</Link>
-    <button aria-label={`Play ${track.title}`} onClick={() => player.play(track)}>Play</button>
+    <button aria-label={`Play ${track.title}`} onClick={() => player.playQueue(tracks, tracks.indexOf(track))}>Play</button>
     <p>{track.genre} · {Math.floor(track.duration / 60)}:{String(track.duration % 60).padStart(2, "0")}</p>
     {track.album && <Link to={`/albums/${track.album._id}`}>{track.album.title}</Link>}
   </article>)}</div>;
