@@ -9,6 +9,12 @@ const userSchema = new Schema({
   sessionVersion: { type: Number, default: 0 },
 }, { timestamps: true });
 export const User = mongoose.model("User", userSchema);
+const sessionSchema = new Schema({
+  user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+  tokenHash: { type: String, required: true, unique: true },
+  expiresAt: { type: Date, required: true, index: { expires: 0 } },
+}, { timestamps: true });
+export const Session = mongoose.model("Session", sessionSchema);
 export const Artist = mongoose.model("Artist", new Schema({
   name: { type: String, required: true, trim: true },
   bio: { type: String, default: "" },

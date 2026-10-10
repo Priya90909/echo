@@ -81,3 +81,14 @@ p { color: var(--muted); line-height: 1.75; }
   .shell-footer { padding: 20px; flex-wrap: wrap; }
   .shell-footer > span:last-child { width: 100%; margin-left: 0; }
 }
+.auth-page { max-width: 480px; margin: 0 auto; padding: 55px 24px; }
+.auth-page h1 { margin-top: 46px; font-size: 36px; letter-spacing: -1px; }
+.auth-page form { display: grid; gap: 18px; margin: 28px 0; }
+.auth-page label { display: grid; gap: 8px; font-size: 14px; }
+.auth-page input { width: 100%; padding: 13px; background: #18201c; border: 1px solid #344039; border-radius: 8px; color: inherit; font: inherit; }
+.auth-page input:focus-visible, button:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+.auth-page small { color: var(--muted); }
+button { font: inherit; cursor: pointer; padding: 10px 16px; border: 1px solid var(--line); border-radius: 8px; background: #203027; color: inherit; }
+button:disabled { opacity: .6; cursor: wait; }
+[role="alert"] { color: #ffc4bb; }
+.account-error { padding: 0 36px; }

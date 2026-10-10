@@ -2,6 +2,7 @@ import { Link, NavLink, Route, Routes } from "react-router-dom";
 import { AudioLines, Home, Search, Library, Heart, History, Radio, Users, Mic2, Settings, ArrowUpRight } from "lucide-react";
 import { Brand, ButtonLink } from "./UI.jsx";
 import Placeholder from "../pages/Placeholder.jsx";
+import { useSession } from "../session.jsx";
 
 const pages = [
   ["/home", "Discover", Home, "Your home for new sounds and familiar favorites."],
@@ -16,6 +17,7 @@ const pages = [
   ["/settings", "Settings", Settings, "Make ECHO feel like your own."],
 ];
 export default function Shell() {
+  const { user, loading, error, signOut } = useSession();
   return (
     <div className="shell">
       <a className="skip-link" href="#main-content">Skip to content</a>
@@ -31,7 +33,8 @@ export default function Shell() {
         </div>
       </aside>
       <div className="workspace">
-        <header className="topbar"><span className="top-note">A little discovery, every day.</span><div className="account-links"><Link to="/login">Sign in</Link><ButtonLink to="/register">Join ECHO</ButtonLink></div></header>
+        <header className="topbar"><span className="top-note">A little discovery, every day.</span><div className="account-links">{loading ? <span role="status">Connecting…</span> : user ? <><span>{user.name}</span><button onClick={() => void signOut()}>Sign out</button></> : <><Link to="/login">Sign in</Link><ButtonLink to="/register">Join ECHO</ButtonLink></>}</div></header>
+        {error && <p role="alert" className="account-error">{error}</p>}
         <main id="main-content" tabIndex={-1}>
           <Routes>
             {pages.map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
