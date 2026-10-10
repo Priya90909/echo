@@ -1,10 +1,14 @@
-import "dotenv/config";
+import mongoose from "mongoose";
 import { app } from "./app.js";
-
-const port = Number(process.env.PORT ?? 4000);
-if (!Number.isInteger(port) || port < 1 || port > 65535) {
-  throw new Error("PORT must be an integer between 1 and 65535.");
+import { config } from "./config.js";
+import { logger } from "./logger.js";
+try {
+  await mongoose.connect(config.MONGO_URI, { serverSelectionTimeoutMS: 5000 });
+  const server = app.listen(config.PORT, "127.0.0.1", () => logger.info({ port: config.PORT }, "ECHO API ready"));
+  for (const signal of ["SIGINT", "SIGTERM"]) {
+    process.once(signal, () => server.close(async () => { await mongoose.disconnect(); process.exit(0); }));
+  }
+} catch (error) {
+  logger.error({ name: error.name }, "Could not connect to MongoDB. Check MONGO_URI and start MongoDB.");
+  process.exitCode = 1;
 }
-app.listen(port, "127.0.0.1", () => {
-  console.log(`ECHO API running at http://127.0.0.1:${port}`);
-});

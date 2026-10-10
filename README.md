@@ -4,7 +4,7 @@ A music app built with React, JavaScript, Vite and Express.
 
 ## Current progress
 
-Stage 2: visual shell and navigation. Includes the landing page, responsive sidebar, top bar, reusable UI components and routes with placeholder content. Stage 1 workspace setup and the API health endpoint remain available.
+Stage 3: API and database foundation. Adds MongoDB User, Artist and Track models, validated environment configuration, request logging, security middleware and database-aware health checks. The stage 2 visual shell remains available.
 
 ## Run locally
 
@@ -12,6 +12,7 @@ Requires Node.js 22.12 or newer.
 
 ```sh
 npm ci
+docker compose up -d
 npm run dev
 ```
 
@@ -27,4 +28,4 @@ The API uses port 4000 by default. Optional local configuration can be copied fr
 npm run build
 ```
 
-Navigation and page layouts work; account screens and music pages currently show placeholders. This stage has no database, login, song catalog or music playback yet. Those features will be added in later stages. Local environment files, dependencies and generated builds are excluded from Git.
+Navigation and page layouts work; account screens and music pages currently show placeholders. MongoDB must be running before the API starts. Login, song catalog and playback will be added in later stages. Those features will be added in later stages. Local environment files, dependencies and generated builds are excluded from Git.
