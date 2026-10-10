@@ -3,6 +3,8 @@ import { AudioLines, Home, Search, Library, Heart, History, Radio, Users, Mic2, 
 import { Brand, ButtonLink } from "./UI.jsx";
 import Placeholder from "../pages/Placeholder.jsx";
 import HomePage from "../pages/Home.jsx";
+import SearchPage from "../pages/Search.jsx";
+import Detail from "../pages/Detail.jsx";
 import { useSession } from "../session.jsx";
 
 const pages = [
@@ -39,7 +41,10 @@ export default function Shell() {
         <main id="main-content" tabIndex={-1}>
           <Routes>
             <Route path="/home" element={<HomePage />} />
-            {pages.filter(([path]) => path !== "/home").map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
+            <Route path="/search" element={<SearchPage />} />
+            <Route path="/artists/:id" element={<Detail kind="artists" />} />
+            <Route path="/albums/:id" element={<Detail kind="albums" />} />
+            {pages.filter(([path]) => !["/home", "/search"].includes(path)).map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
             <Route path="*" element={<Placeholder title="Page not found" description="This page is not available. Head back to Discover." />} />
           </Routes>
         </main>

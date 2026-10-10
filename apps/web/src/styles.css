@@ -97,3 +97,6 @@ button:disabled { opacity: .6; cursor: wait; }
 .song-card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 10px; }
 .song-card h3 { margin-bottom: 8px; }
 .song-card p, .song-card a { font-size: 13px; color: var(--muted); }
+.search-controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
+.search-controls input, .search-controls select { padding: 12px; background: #18251d; color: inherit; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
+.pagination { display: flex; align-items: center; gap: 16px; }

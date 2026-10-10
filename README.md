@@ -52,3 +52,7 @@ Downloaded music, local environment files, dependencies and generated builds are
 ## Stage 5 — catalog and discovery
 Run npm run seed after configuring the local API environment to add six demo song records and bundled SVG covers. Home loads published tracks from MongoDB with loading, error and empty states. These fixtures contain metadata only; playback is introduced in stage 7.
 
+
+## Stage 6 — search and detail pages
+Search song titles, artists and genres; filter by genre and page through results. Artist and album links open catalog detail pages. Playback is added in the next stage.
+
