@@ -25,6 +25,13 @@ export const Track = mongoose.model("Track", new Schema({
   artist: { type: Schema.Types.ObjectId, ref: "Artist", required: true },
   duration: { type: Number, min: 0, default: 0 },
   cover: String,
+  genre: { type: String, default: "Ambient" },
+  album: { type: Schema.Types.ObjectId, ref: "Album" },
   audioKey: String,
   published: { type: Boolean, default: false },
+}, { timestamps: true }));
+export const Album = mongoose.model("Album", new Schema({
+  title: { type: String, required: true },
+  artist: { type: Schema.Types.ObjectId, ref: "Artist", required: true },
+  cover: String,
 }, { timestamps: true }));

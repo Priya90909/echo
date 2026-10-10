@@ -2,6 +2,7 @@ import { Link, NavLink, Route, Routes } from "react-router-dom";
 import { AudioLines, Home, Search, Library, Heart, History, Radio, Users, Mic2, Settings, ArrowUpRight } from "lucide-react";
 import { Brand, ButtonLink } from "./UI.jsx";
 import Placeholder from "../pages/Placeholder.jsx";
+import HomePage from "../pages/Home.jsx";
 import { useSession } from "../session.jsx";
 
 const pages = [
@@ -37,7 +38,8 @@ export default function Shell() {
         {error && <p role="alert" className="account-error">{error}</p>}
         <main id="main-content" tabIndex={-1}>
           <Routes>
-            {pages.map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
+            <Route path="/home" element={<HomePage />} />
+            {pages.filter(([path]) => path !== "/home").map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
             <Route path="*" element={<Placeholder title="Page not found" description="This page is not available. Head back to Discover." />} />
           </Routes>
         </main>

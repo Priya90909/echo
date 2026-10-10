@@ -48,3 +48,7 @@ The JavaScript API runs directly with `npm start -w @echo/api`. Production requi
 Create an account at /register, then use the name and Sign out control in the top bar. Passwords must contain 12–128 characters. Sign in at /login. Account identity survives a page reload, and refresh cookies renew expired access sessions. Sign-out revokes the user's current sessions.
 
 Downloaded music, local environment files, dependencies and generated builds are excluded from Git. No later music features are included in this stage.
+
+## Stage 5 — catalog and discovery
+Run npm run seed after configuring the local API environment to add six demo song records and bundled SVG covers. Home loads published tracks from MongoDB with loading, error and empty states. These fixtures contain metadata only; playback is introduced in stage 7.
+
