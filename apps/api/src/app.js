@@ -11,6 +11,7 @@ import { rateLimit } from "express-rate-limit";
 import { csrf } from "./auth.js";
 import { authenticationRoutes } from "./modules/authentication.js";
 import { catalogRoutes } from "./modules/catalog.js";
+import { mediaRoutes } from "./media.js";
 export const app = express();
 app.disable("x-powered-by");
 app.use(helmet());
@@ -35,6 +36,7 @@ app.use("/api", csrf, rateLimit({ windowMs: 60000, limit: 180 }));
 app.use("/api/auth", rateLimit({ windowMs: 15 * 60000, limit: 40 }));
 app.use(authenticationRoutes);
 app.use(catalogRoutes);
+app.use(mediaRoutes);
 app.use((_req, res) => res.status(404).json({ error: "Endpoint not found." }));
 app.use((err, _req, res, _next) => {
   if (err instanceof ZodError) return res.status(400).json({ error: "Validation failed.", details: err.flatten() });

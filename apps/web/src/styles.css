@@ -100,3 +100,11 @@ button:disabled { opacity: .6; cursor: wait; }
 .search-controls { display: flex; flex-wrap: wrap; gap: 12px; margin: 24px 0; }
 .search-controls input, .search-controls select { padding: 12px; background: #18251d; color: inherit; border: 1px solid var(--line); border-radius: 8px; font: inherit; }
 .pagination { display: flex; align-items: center; gap: 16px; }
+.workspace { padding-bottom: 140px; }
+.music-player { position: fixed; bottom: 0; left: 0; right: 0; z-index: 10; display: flex; align-items: center; gap: 20px; padding: 18px 24px; background: #152219; border-top: 1px solid var(--line); }
+.music-player small { display: block; color: var(--muted); }
+.music-player > div { flex: 1; min-width: 0; }
+.player-seek { display: flex; align-items: center; gap: 10px; flex: 2; }
+.player-seek input { width: 100%; }
+.music-player > input { max-width: 100px; }
+@media (max-width: 760px) { .music-player { flex-wrap: wrap; gap: 12px; padding: 12px; } .player-seek { flex-basis: 100%; order: 5; } }

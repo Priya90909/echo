@@ -5,6 +5,7 @@ import Placeholder from "../pages/Placeholder.jsx";
 import HomePage from "../pages/Home.jsx";
 import SearchPage from "../pages/Search.jsx";
 import Detail from "../pages/Detail.jsx";
+import Player from "./Player.jsx";
 import { useSession } from "../session.jsx";
 
 const pages = [
@@ -50,6 +51,7 @@ export default function Shell() {
         </main>
         <footer className="shell-footer"><AudioLines size={16} aria-hidden="true" /><span>Find your frequency.</span><span>INDEPENDENT SOUND. SHARED MOMENTS.</span></footer>
       </div>
+      <Player />
     </div>
   );
 }

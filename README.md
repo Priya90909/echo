@@ -56,3 +56,7 @@ Run npm run seed after configuring the local API environment to add six demo son
 ## Stage 6 — search and detail pages
 Search song titles, artists and genres; filter by genre and page through results. Artist and album links open catalog detail pages. Playback is added in the next stage.
 
+
+## Stage 7 — native playback
+Run npm run seed again to generate an original 15-second WAV demo melody locally. All demo tracks use this test audio; it is not a commercial song download. Sign in to play, pause, seek and change volume. Audio is served through authenticated byte-range requests. Files under work/ stay out of Git.
+
