@@ -13,6 +13,7 @@ import { authenticationRoutes } from "./modules/authentication.js";
 import { catalogRoutes } from "./modules/catalog.js";
 import { mediaRoutes } from "./media.js";
 import { libraryRoutes } from "./modules/library.js";
+import { listeningRoutes } from "./modules/listening.js";
 export const app = express();
 app.disable("x-powered-by");
 app.use(helmet());
@@ -39,6 +40,7 @@ app.use(authenticationRoutes);
 app.use(catalogRoutes);
 app.use(mediaRoutes);
 app.use(libraryRoutes);
+app.use(listeningRoutes);
 app.use((_req, res) => res.status(404).json({ error: "Endpoint not found." }));
 app.use((err, _req, res, _next) => {
   if (err instanceof ZodError) return res.status(400).json({ error: "Validation failed.", details: err.flatten() });

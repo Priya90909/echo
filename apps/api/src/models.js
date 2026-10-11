@@ -39,3 +39,6 @@ const likeSchema = new Schema({ user: { type: Schema.Types.ObjectId, ref: "User"
 likeSchema.index({ user: 1, track: 1 }, { unique: true });
 export const Like = mongoose.model("Like", likeSchema);
 export const Playlist = mongoose.model("Playlist", new Schema({ name: { type: String, required: true, maxlength: 80 }, owner: { type: Schema.Types.ObjectId, ref: "User", required: true }, tracks: [{ type: Schema.Types.ObjectId, ref: "Track" }], deletedAt: { type: Date, default: null } }, { timestamps: true }));
+const eventSchema = new Schema({ user: { type: Schema.Types.ObjectId, ref: "User", required: true }, track: { type: Schema.Types.ObjectId, ref: "Track", required: true }, seconds: { type: Number, min: 1, required: true }, listenId: { type: String, required: true } }, { timestamps: true });
+eventSchema.index({ user: 1, listenId: 1 }, { unique: true });
+export const ListenEvent = mongoose.model("ListenEvent", eventSchema);
