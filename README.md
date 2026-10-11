@@ -4,7 +4,7 @@ A music app built with React, JavaScript, Vite and Express.
 
 ## Current progress
 
-Stages 1–10: workspace foundation, responsive visual shell, MongoDB-backed API, and account registration/sign-in. Authentication includes hashed passwords, HTTP-only access and refresh cookies, session rotation, CSRF checks, rate limiting and sign-out.
+Stages 1–11: workspace foundation, responsive visual shell, MongoDB-backed API, and account registration/sign-in. Authentication includes hashed passwords, HTTP-only access and refresh cookies, session rotation, CSRF checks, rate limiting and sign-out.
 
 Catalog discovery, search, artist/album details and native audio playback are implemented. Queue, shuffle, repeat and an expanded player are available. Likes, private playlists, listening history and MoodFlow are available. Offline music comes in a later stage.
 
@@ -47,7 +47,7 @@ The JavaScript API runs directly with `npm start -w @echo/api`. Production requi
 
 Create an account at /register, then use the name and Sign out control in the top bar. Passwords must contain 12–128 characters. Sign in at /login. Account identity survives a page reload, and refresh cookies renew expired access sessions. Sign-out revokes the user's current sessions.
 
-Downloaded music, local environment files, dependencies and generated builds are excluded from Git. Stages after 10 remain outside this snapshot.
+Downloaded music, local environment files, dependencies and generated builds are excluded from Git. Stages after 11 remain outside this snapshot.
 
 ## Stage 5 — catalog and discovery
 Run npm run seed after configuring the local API environment to add six demo song records and bundled SVG covers. Home loads published tracks from MongoDB with loading, error and empty states. These fixtures contain metadata only; playback is introduced in stage 7.
@@ -71,4 +71,10 @@ Signed-in listeners can save songs using the expanded or bottom player heart. Cr
 
 ## Stage 10 — listening history and MoodFlow
 Playback records recent songs after actual listening, with duplicate event protection. History shows recent discoveries; MoodFlow builds a playable queue for calm, focus, energy or reflective listening.
+
+
+## Stage 11 — EchoRooms
+Signed-in listeners can create a room or join with its six-character code. Up to eight listeners share the host’s current song, playback position and pause state through authenticated Socket.IO connections. Guests cannot change the shared state; the next listener becomes host when the host leaves. Rooms are temporary and close when empty or when the API restarts. Leaving the Rooms page leaves the room. Browser autoplay restrictions may require guests to press Play once.
+
+The Vite proxy forwards both /api and /socket.io. Production hosting must forward WebSocket upgrades and allow the configured WEB_ORIGIN. Rooms currently live in one API process.
 

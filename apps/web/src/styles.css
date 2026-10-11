@@ -125,3 +125,7 @@ button:disabled { opacity: .6; cursor: wait; }
 .playlist-picker { position: absolute; right: 0; z-index: 20; min-width: 240px; padding: 16px; background: #24372a; border: 1px solid var(--line); border-radius: 12px; }
 .playlist-picker button { display: block; width: 100%; margin: 8px 0; }
 @media (max-width: 760px) { .music-player { flex-wrap: wrap; gap: 12px; padding: 12px; } .player-seek { flex-basis: 100%; order: 5; } }
+
+.room-entry { display: flex; flex-wrap: wrap; gap: 24px; align-items: start; margin: 24px 0; }
+.room-entry form { display: grid; gap: 12px; max-width: 320px; }
+.room-entry input { padding: 12px; background: #14241b; color: inherit; border: 1px solid #42574a; border-radius: 8px; }

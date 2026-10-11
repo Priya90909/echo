@@ -8,6 +8,7 @@ import Detail from "../pages/Detail.jsx";
 import Player from "./Player.jsx";
 import LibraryPage, { Likes, Playlist } from "../pages/Library.jsx";
 import { History as HistoryPage, MoodFlow } from "../pages/Listening.jsx";
+import Rooms from "../pages/Rooms.jsx";
 import { useSession } from "../session.jsx";
 
 const pages = [
@@ -49,10 +50,11 @@ export default function Shell() {
             <Route path="/likes" element={<Likes />} />
             <Route path="/history" element={<HistoryPage />} />
             <Route path="/moodflow" element={<MoodFlow />} />
+            <Route path="/rooms" element={<Rooms />} />
             <Route path="/playlists/:id" element={<Playlist />} />
             <Route path="/artists/:id" element={<Detail kind="artists" />} />
             <Route path="/albums/:id" element={<Detail kind="albums" />} />
-            {pages.filter(([path]) => !["/home", "/search", "/library", "/likes", "/history", "/moodflow"].includes(path)).map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
+            {pages.filter(([path]) => !["/home", "/search", "/library", "/likes", "/history", "/moodflow", "/rooms"].includes(path)).map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
             <Route path="*" element={<Placeholder title="Page not found" description="This page is not available. Head back to Discover." />} />
           </Routes>
         </main>
