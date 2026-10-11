@@ -117,4 +117,11 @@ button:disabled { opacity: .6; cursor: wait; }
 .expanded-player img { width: min(330px, 40vh, 80vw); aspect-ratio: 1; border-radius: 16px; }
 .expanded-player input { width: min(560px, 100%); }
 .expanded-player::backdrop { background: #070c09dd; }
+.song-heart { border: 0; background: transparent; }
+.song-heart[aria-pressed="true"] { color: var(--green); }
+.full-song, .full-actions { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.full-song { width: min(560px, 100%); }
+.song-playlists { position: relative; }
+.playlist-picker { position: absolute; right: 0; z-index: 20; min-width: 240px; padding: 16px; background: #24372a; border: 1px solid var(--line); border-radius: 12px; }
+.playlist-picker button { display: block; width: 100%; margin: 8px 0; }
 @media (max-width: 760px) { .music-player { flex-wrap: wrap; gap: 12px; padding: 12px; } .player-seek { flex-basis: 100%; order: 5; } }

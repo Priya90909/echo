@@ -35,3 +35,7 @@ export const Album = mongoose.model("Album", new Schema({
   artist: { type: Schema.Types.ObjectId, ref: "Artist", required: true },
   cover: String,
 }, { timestamps: true }));
+const likeSchema = new Schema({ user: { type: Schema.Types.ObjectId, ref: "User", required: true }, track: { type: Schema.Types.ObjectId, ref: "Track", required: true } }, { timestamps: true });
+likeSchema.index({ user: 1, track: 1 }, { unique: true });
+export const Like = mongoose.model("Like", likeSchema);
+export const Playlist = mongoose.model("Playlist", new Schema({ name: { type: String, required: true, maxlength: 80 }, owner: { type: Schema.Types.ObjectId, ref: "User", required: true }, tracks: [{ type: Schema.Types.ObjectId, ref: "Track" }], deletedAt: { type: Date, default: null } }, { timestamps: true }));

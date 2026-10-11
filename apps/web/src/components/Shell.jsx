@@ -6,6 +6,7 @@ import HomePage from "../pages/Home.jsx";
 import SearchPage from "../pages/Search.jsx";
 import Detail from "../pages/Detail.jsx";
 import Player from "./Player.jsx";
+import LibraryPage, { Likes, Playlist } from "../pages/Library.jsx";
 import { useSession } from "../session.jsx";
 
 const pages = [
@@ -43,9 +44,12 @@ export default function Shell() {
           <Routes>
             <Route path="/home" element={<HomePage />} />
             <Route path="/search" element={<SearchPage />} />
+            <Route path="/library" element={<LibraryPage />} />
+            <Route path="/likes" element={<Likes />} />
+            <Route path="/playlists/:id" element={<Playlist />} />
             <Route path="/artists/:id" element={<Detail kind="artists" />} />
             <Route path="/albums/:id" element={<Detail kind="albums" />} />
-            {pages.filter(([path]) => !["/home", "/search"].includes(path)).map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
+            {pages.filter(([path]) => !["/home", "/search", "/library", "/likes"].includes(path)).map(([path, title, icon, description]) => <Route key={path} path={path} element={<Placeholder title={title} description={description} icon={icon} />} />)}
             <Route path="*" element={<Placeholder title="Page not found" description="This page is not available. Head back to Discover." />} />
           </Routes>
         </main>

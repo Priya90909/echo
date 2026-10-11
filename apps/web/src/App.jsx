@@ -4,16 +4,17 @@ import Shell from "./components/Shell.jsx";
 import Auth from "./pages/Auth.jsx";
 import { SessionProvider } from "./session.jsx";
 import { PlayerProvider } from "./player.jsx";
+import { LibraryProvider } from "./library.jsx";
 
 export default function App() {
   return (
-    <SessionProvider><PlayerProvider><BrowserRouter>
+    <SessionProvider><LibraryProvider><PlayerProvider><BrowserRouter>
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Auth key="login" />} />
         <Route path="/register" element={<Auth key="register" register />} />
         <Route path="/*" element={<Shell />} />
       </Routes>
-    </BrowserRouter></PlayerProvider></SessionProvider>
+    </BrowserRouter></PlayerProvider></LibraryProvider></SessionProvider>
   );
 }

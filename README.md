@@ -64,3 +64,7 @@ Run npm run seed again to generate an original 15-second WAV demo melody locally
 ## Stage 8 — queue and expanded player
 Song cards start a queue from the displayed list. Use next/previous, shuffle and repeat off/all/one, select a track from Up next, and expand the player. Close the expanded view with its close button or Escape; playback stays shared with the bottom bar.
 
+
+## Stage 9 — likes and playlists
+Signed-in listeners can save songs using the expanded or bottom player heart. Create a playlist in Your library, then add a song using the icon beside the expanded-player close control. Playlists are private to their owner; duplicate tracks are rejected.
+
