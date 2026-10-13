@@ -3,6 +3,7 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import "./styles.css";
+import { prepareOfflineApp } from "./offline.js";
 const App = lazy(() => import("./App.jsx"));
 class Boundary extends React.Component {
   state = { error: false };
@@ -37,3 +38,13 @@ createRoot(document.getElementById("root")).render(
     </Boundary>
   </React.StrictMode>,
 );
+// Refresh an already-prepared offline app so an old unscoped shell is replaced.
+if ("serviceWorker" in navigator) {
+  void navigator.serviceWorker
+    .getRegistration()
+    .then((registration) => {
+      if (registration?.active?.scriptURL.endsWith("/offline-sw.js"))
+        return prepareOfflineApp();
+    })
+    .catch(() => {});
+}

@@ -23,6 +23,7 @@ export const usePlayer = create((set, get) => ({
     audio.removeAttribute("src");
     if (localUrl) URL.revokeObjectURL(localUrl);
     localUrl = "";
+    if ("mediaSession" in navigator) navigator.mediaSession.metadata = null;
     set({
       track: null,
       queue: [],
