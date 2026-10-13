@@ -1,20 +1,77 @@
 # ECHO
 
-ECHO brings discovery, listening, likes, playlists and shared listening rooms into one music interface. The React frontend uses a persistent player, full-screen song view, cover-art browsing, MoodFlow and a personal offline file library.
+ECHO is my end-term project: a music app where users can find songs, play them, save favourites and make playlists. I also added a personal offline library and shared listening rooms.
 
-## Current music and offline support
+- **Student:** Priya Singh
+- **Live app:** [Open ECHO](https://echo-priya90909.onrender.com)
+- **Source code:** [GitHub repository](https://github.com/Priya90909/echo)
 
-The optional licensed catalog importer selects 48 full Kevin MacLeod recordings with individual original ECHO covers and CC BY 4.0 credits. Run `npm run catalog:import` with the infrastructure running; downloads can fail individually and are safe to retry. Downloaded recordings and all local data are excluded from this repository. See [catalog provenance](docs/CATALOG.md).
+## Problem statement
 
-Offline music accepts personal MP3, M4A, WAV and supported MP4 files, stores them in browser IndexedDB and plays them through the native ECHO player. Prepare ECHO for offline use after importing files; browser storage and cached app assets are required to reopen without a connection. Browser storage is device-specific and can be cleared or evicted.
+I wanted a music app where listening, saving songs and organising playlists feel connected. I also wanted users to be able to play their own audio files when they do not have internet access.
 
-The Spotify embed has been removed. Direct Drive streaming and Spotify playlist matching are not implemented. This repository does not contain commercial Spotify or Drive recordings.
+The problem I focused on was bringing these everyday music tasks into one app, with saved account data and a player that keeps working while the user moves between pages.
 
-## Secrets and deployment
+## Target users
 
-Never commit `.env`, credentials, local databases, downloaded music or generated build folders. `.env.example` contains development placeholders only. Production deployment requires a persistent MongoDB replica set, Redis, S3-compatible storage, a running audio worker and production secrets configured in the hosting provider. See [deployment guidance](docs/DEPLOYMENT.md). A static frontend deployment alone does not enable backend features.
+ECHO is for people who want to discover music, keep their favourite songs together and listen to their personal audio files offline. It also has an Artist Studio for people who want to upload original music or music they have permission to share.
 
-A JavaScript MERN music application for independent sound, mood-led discovery, and shared listening. The code contains a working foundation and an integrated first implementation of the listener, artist, and room flows. This is a development release, not a claim of production readiness. See [status](docs/STATUS.md) for verified functionality and remaining work.
+## My solution
+
+Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Personal files can be imported into the browser's offline library. After preparing the app for offline use, those files can be played without a connection.
+
+## Main workflows
+
+1. **Discover and listen:** browse or search songs, play a track, seek through it and use the queue.
+2. **Save music:** sign in, like a song, create a playlist and add songs to it.
+3. **Listen offline:** import a personal audio file, prepare the app, then reopen it and play the file offline.
+4. **Listen together:** create or join an EchoRoom and follow the host's playback.
+5. **Share original music:** create an artist profile, upload a permitted audio file and wait for processing and review.
+
+## Tech stack
+
+I used JavaScript and JSX throughout the repository.
+
+| Part             | Technologies                                     | What it does                                            |
+| ---------------- | ------------------------------------------------ | ------------------------------------------------------- |
+| Frontend         | React, Vite, Tailwind CSS, React Router          | Pages, navigation and the responsive interface          |
+| Frontend state   | TanStack Query, Zustand                          | Server data and the shared music player                 |
+| Backend          | Node.js, Express, Zod                            | API routes and input validation                         |
+| Database         | MongoDB, Mongoose                                | Accounts, songs, likes, playlists and listening history |
+| Authentication   | bcrypt, JWT cookies, CSRF checks                 | Password hashing and protected account actions          |
+| Shared rooms     | Socket.IO, Redis                                 | Room state, chat and playback updates                   |
+| Audio processing | BullMQ, FFmpeg, ffprobe                          | Background processing of uploaded audio                 |
+| Media storage    | S3-compatible object storage                     | Audio files, cover images and signed playback links     |
+| Offline support  | IndexedDB, service worker                        | Personal audio files and cached app pages               |
+| Testing          | Vitest, integration tests, Playwright test files | Checks for application behaviour                        |
+
+## Architecture
+
+The React app talks to the Express API. The API reads and saves data in MongoDB. Audio files and cover images are kept in object storage rather than in GitHub. The player uses signed links to play cloud audio.
+
+For uploads, the API adds a job to BullMQ. The audio worker processes the file with FFmpeg and updates its status. Uploaded songs need processing and approval before they appear in the public catalog.
+
+Socket.IO sends room updates, while Redis stores the shared room state. Offline files stay in IndexedDB on the user's device and play through the same player.
+
+More details are in [architecture](docs/ARCHITECTURE.md) and [API documentation](docs/API.md).
+
+## Deployment
+
+The live app is at [echo-priya90909.onrender.com](https://echo-priya90909.onrender.com). It uses Render, MongoDB Atlas, Upstash Redis and private Supabase object storage. Render's free service can take longer to open after being inactive.
+
+Cloud playback needs an internet connection. Personal offline files are available only in the browser and device where they were imported. Clearing browser storage removes those copies.
+
+## Music and project scope
+
+The licensed catalog importer has a manifest for 48 Kevin MacLeod recordings with CC BY 4.0 attribution and original ECHO artwork. The local release check used the 47 recordings available in the cache. Downloaded audio is not included in GitHub. See [catalog credits](docs/CATALOG.md).
+
+The app does not import or download commercial Spotify songs or directly stream a Google Drive playlist. Offline music uses files the user already has permission to use.
+
+This is a student project. I focused on getting the main workflows working. Optional Google sign-in needs provider credentials, and features such as password recovery and running multiple API instances are future work. Verified checks and limitations are listed in [project status](docs/STATUS.md).
+
+## Development and AI assistance
+
+I used AI assistance for code generation, debugging, refactoring, documentation and testing. The repository includes the resulting application code and tests. Open-source libraries are listed in the package files, and third-party music is credited separately.
 
 ## Start locally
 
