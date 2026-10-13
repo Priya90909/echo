@@ -1,4 +1,10 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
+import { Link } from "react-router-dom";
+import {
+  accountSnapshot,
+  offlineAccount,
+  subscribeAccount,
+} from "../offline-account.js";
 import { Art } from "../components/Catalog.jsx";
 import { usePlayer } from "../player.js";
 import {
@@ -8,28 +14,50 @@ import {
   removeSaved,
 } from "../offline.js";
 import { time } from "../format.js";
-export default function Offline() {
+export default function Offline({ user }) {
+  const snapshot = useSyncExternalStore(
+    subscribeAccount,
+    accountSnapshot,
+    () => "",
+  );
+  const cached = offlineAccount();
+  const owner = user?._id === cached?._id ? user?._id : null;
   const [tracks, setTracks] = useState([]),
     [busy, setBusy] = useState(false),
     [message, setMessage] = useState(""),
     [filter, setFilter] = useState("");
   const player = usePlayer();
   async function refresh() {
-    setTracks((await savedSongs()).map((s) => s.track));
+    const songs = await savedSongs();
+    if (owner && owner === offlineAccount()?._id)
+      setTracks(songs.map((s) => s.track));
   }
   useEffect(() => {
     void refresh().catch((e) => setMessage(e.message));
-  }, []);
-  const shown = tracks.filter((t) =>
+    setTracks([]);
+  }, [owner]);
+  const ownTracks = tracks.filter((t) => t.offlineOwner === owner);
+  const shown = ownTracks.filter((t) =>
     t.title.toLowerCase().includes(filter.toLowerCase()),
   );
+  if (!owner)
+    return (
+      <main className="page">
+        <h1>Your offline music.</h1>
+        <p>Sign in to open your own saved music library on this device.</p>
+        <Link className="primary" to="/login">
+          Sign in
+        </Link>
+      </main>
+    );
   return (
     <main className="page">
       <span className="eyebrow">YOUR MUSIC · ON THIS DEVICE</span>
       <h1>Offline music.</h1>
       <p>
         Full files. Your ECHO player. No internet needed after importing and
-        preparing this page.
+        preparing this page. These files are saved for your account on this
+        device.
       </p>
       <div className="search-controls">
         <label className="primary">
@@ -90,7 +118,7 @@ export default function Offline() {
         onChange={(e) => setFilter(e.target.value)}
       />
       <div className="section-heading">
-        <h2>{tracks.length} songs on this device</h2>
+        <h2>{ownTracks.length} songs on this device</h2>
         <button
           className="primary"
           disabled={!shown.length}
@@ -117,12 +145,16 @@ export default function Offline() {
           </article>
         ))}
       </div>
-      {!tracks.length && (
+      {!ownTracks.length && (
         <p>
           Add MP3, M4A, WAV or MP4 files from your computer. MP4 audio plays
           through ECHO without opening a video player.
         </p>
       )}
+      <p>
+        Files imported before the account-library update need to be imported
+        again while signed in to the correct account.
+      </p>
       <p>
         Files stay in this browser on this device. Clearing browser storage
         removes these copies; keep your original files. Cloud playlists and

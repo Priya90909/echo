@@ -70,7 +70,11 @@ export function csrf(req, res, next) {
   )
     return res
       .status(403)
-      .json({ error: "Invalid request origin or CSRF token." });
+      .json({
+        code: "CSRF_INVALID",
+        error:
+          "Your session could not be verified. Refresh the page and try again.",
+      });
   next();
 }
 export function publicUser(u) {

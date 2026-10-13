@@ -116,4 +116,24 @@ describe("HTTP boundary", () => {
     expect(res.status).toBe(503);
     expect(res.body.database).toBe("unavailable");
   });
+  it("keeps a browser's token valid when another tab requests it", async () => {
+    const browser = request.agent(app);
+    const first = await browser.get("/api/auth/csrf");
+    const second = await browser.get("/api/auth/csrf");
+    expect(second.body.token).toBe(first.body.token);
+    expect(second.headers["cache-control"]).toBe("no-store");
+    const accepted = await browser
+      .post("/api/unknown-csrf-check")
+      .set("Origin", "http://127.0.0.1:5173")
+      .set("x-csrf-token", first.body.token)
+      .send({});
+    expect(accepted.status).toBe(404);
+    const rejected = await browser
+      .post("/api/unknown-csrf-check")
+      .set("Origin", "http://127.0.0.1:5173")
+      .set("x-csrf-token", "0".repeat(64))
+      .send({});
+    expect(rejected.status).toBe(403);
+    expect(rejected.body.code).toBe("CSRF_INVALID");
+  });
 });

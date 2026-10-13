@@ -58,3 +58,13 @@ The final JavaScript application was built into a Docker image and deployed to t
 - At 390px width, the page had no horizontal overflow and the mini-player heart was visible beside the queue.
 
 The earlier local offline and room checks still apply to this application code. Optional Google sign-in, multiple API instances and a full production security audit remain outside the completed checks. The demo video and submission form are separate submission tasks.
+
+## Account-private offline library — 14 October 2026
+
+Offline files now use an account ID and file ID together. Listing, playing, deduplication and deletion stay within the active account. Signing out or switching accounts stops playback, clears the queue and removes the previous account's cached cloud data. The last verified account can reopen its own library offline; explicit sign-out removes that local account reference.
+
+Older files had no owner recorded. Their bytes remain in the legacy store, but they are not shown or silently assigned to an account. Import the original files again while signed in to the correct account. The cached app shell is versioned to replace the older unscoped client.
+
+The CSRF endpoint now reuses a valid existing browser token and disables caching. The client shares token requests and retries a specifically rejected CSRF request once, while keeping origin and authorization checks enabled.
+
+Verification for the account separation fix: 30 standard tests and six MongoDB integration tests passed. The browser check imported and played a file in account A, confirmed account B had zero visible songs, switched back to A and restored the saved file, then stopped all local services and reopened/played it offline. The production build passed. CSRF tests cover stable tokens across tabs, one bounded recovery retry, and continued authorization/origin rejection.

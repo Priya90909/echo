@@ -1,8 +1,25 @@
+import { offlineAccount } from "./offline-account.js";
+function ownerId() {
+  const owner = offlineAccount()?._id;
+  if (!owner) throw new Error("Sign in to use your offline music library.");
+  return owner;
+}
+function verifyOwner(owner) {
+  if (owner !== offlineAccount()?._id)
+    throw new Error("Your account changed. Please try again.");
+}
 async function db() {
   return new Promise((resolve, reject) => {
-    const r = indexedDB.open("echo-personal-music", 1);
-    r.onupgradeneeded = () =>
-      r.result.createObjectStore("songs", { keyPath: "id" });
+    const r = indexedDB.open("echo-personal-music", 2);
+    r.onupgradeneeded = () => {
+      if (!r.result.objectStoreNames.contains("accountSongs")) {
+        const store = r.result.createObjectStore("accountSongs", {
+          keyPath: ["owner", "id"],
+        });
+        store.createIndex("owner", "owner");
+      }
+      // Unowned legacy files stay stored, but cannot be assigned to an arbitrary account.
+    };
     r.onsuccess = () => resolve(r.result);
     r.onerror = () => reject(r.error);
   });
@@ -10,8 +27,16 @@ async function db() {
 async function request(mode, run) {
   const database = await db();
   return new Promise((resolve, reject) => {
-    const tx = database.transaction("songs", mode);
-    const r = run(tx.objectStore("songs"));
+    const tx = database.transaction("accountSongs", mode);
+    let r;
+    try {
+      r = run(tx.objectStore("accountSongs"));
+    } catch (error) {
+      tx.abort();
+      database.close();
+      reject(error);
+      return;
+    }
     tx.oncomplete = () => {
       database.close();
       resolve(r.result);
@@ -26,10 +51,40 @@ async function request(mode, run) {
     };
   });
 }
-export const savedSongs = () => request("readonly", (s) => s.getAll());
-export const savedSong = (id) => request("readonly", (s) => s.get(id));
-export const removeSaved = (id) => request("readwrite", (s) => s.delete(id));
+export async function savedSongs() {
+  if (!offlineAccount()) return [];
+  const owner = ownerId();
+  const songs = await request("readonly", (s) =>
+    s.index("owner").getAll(IDBKeyRange.only(owner)),
+  );
+  verifyOwner(owner);
+  return songs;
+}
+export async function savedSong(id) {
+  const owner = ownerId();
+  const song = await request("readonly", (s) => s.get([owner, id]));
+  verifyOwner(owner);
+  return song;
+}
+export async function removeSaved(id) {
+  const owner = ownerId();
+  return request("readwrite", (s) => {
+    verifyOwner(owner);
+    return s.delete([owner, id]);
+  });
+}
+export async function saveOfflineAudio(track, audio, owner = ownerId()) {
+  verifyOwner(owner);
+  const ownedTrack = { ...track, offlineOwner: owner };
+  await request("readwrite", (s) => {
+    verifyOwner(owner);
+    return s.put({ owner, id: track._id, track: ownedTrack, audio });
+  });
+  verifyOwner(owner);
+  return ownedTrack;
+}
 export async function importFile(file) {
+  const owner = ownerId();
   const url = URL.createObjectURL(file);
   const media = document.createElement("video");
   media.preload = "metadata";
@@ -78,15 +133,16 @@ export async function importFile(file) {
     playCount: 0,
     status: "published",
   };
-  await request("readwrite", (s) => s.put({ id, track, audio: file }));
-  return track;
+  return saveOfflineAudio(track, file, owner);
 }
 export async function prepareOfflineApp() {
   if (!("serviceWorker" in navigator))
     throw new Error("Offline app caching is unavailable in this browser.");
-  await navigator.serviceWorker.register("/offline-sw.js");
+  await navigator.serviceWorker.register("/offline-sw.js", {
+    updateViaCache: "none",
+  });
   await navigator.serviceWorker.ready;
-  const cache = await caches.open("echo-shell-v1");
+  const cache = await caches.open("echo-shell-v2-account");
   const urls = new Set([
     "/",
     "/offline",

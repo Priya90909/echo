@@ -1,7 +1,17 @@
-const SHELL = "echo-shell-v1";
+const SHELL = "echo-shell-v2-account";
 self.addEventListener("install", () => self.skipWaiting());
 self.addEventListener("activate", (event) =>
-  event.waitUntil(self.clients.claim()),
+  event.waitUntil(
+    (async () => {
+      const names = await caches.keys();
+      await Promise.all(
+        names
+          .filter((name) => name.startsWith("echo-shell-") && name !== SHELL)
+          .map((name) => caches.delete(name)),
+      );
+      await self.clients.claim();
+    })(),
+  ),
 );
 self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);

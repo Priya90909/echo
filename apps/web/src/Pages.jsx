@@ -30,7 +30,10 @@ export default function Pages({ user }) {
     <Suspense fallback={<div className="skeleton" />}>
       <Routes>
         <Route path="/home" element={<Home />} />
-        <Route path="/offline" element={<Offline />} />
+        <Route
+          path="/offline"
+          element={<Offline key={user?._id || "signed-out"} user={user} />}
+        />
         <Route path="/search" element={<Search />} />
         <Route path="/library" element={protect(<Library />)} />
         <Route path="/likes" element={protect(<Collection />)} />

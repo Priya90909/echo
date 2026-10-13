@@ -1,4 +1,4 @@
-import { useState, lazy, Suspense } from "react";
+import { useState, useEffect, lazy, Suspense } from "react";
 import { Link, NavLink, Routes, Route, useNavigate } from "react-router-dom";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
@@ -25,6 +25,11 @@ import {
 } from "lucide-react";
 import { api, json } from "./api.js";
 import { usePlayer } from "./player.js";
+import {
+  offlineAccount,
+  rememberAccount,
+  subscribeAccount,
+} from "./offline-account.js";
 import PlayerLike from "./components/PlayerLike.jsx";
 const Pages = lazy(() => import("./Pages.jsx"));
 const FullPlayer = lazy(() => import("./components/FullPlayer.jsx"));
@@ -206,6 +211,12 @@ export function Auth({ register = false }) {
               method: "POST",
               body: json(data),
             });
+            await qc.cancelQueries();
+            qc.removeQueries({
+              predicate: (query) =>
+                !["me", "providers"].includes(query.queryKey[0]),
+            });
+            rememberAccount(u);
             qc.setQueryData(["me"], u);
             navigate("/home");
           } catch (e) {
@@ -306,10 +317,34 @@ function Landing() {
 export default function App() {
   const me = useQuery({
     queryKey: ["me"],
-    queryFn: () => api("/auth/me"),
+    queryFn: async ({ signal }) => {
+      try {
+        const user = await api("/auth/me", { signal });
+        rememberAccount(user);
+        return user;
+      } catch (error) {
+        if (error.status === 401) rememberAccount(null);
+        const cached = offlineAccount();
+        if (cached && error instanceof TypeError)
+          return { ...cached, offline: true };
+        throw error;
+      }
+    },
     retry: false,
   });
   const qc = useQueryClient();
+  useEffect(
+    () =>
+      subscribeAccount((event) => {
+        qc.removeQueries({
+          predicate: (query) =>
+            !["me", "providers"].includes(query.queryKey[0]),
+        });
+        if (event.type === "storage")
+          void qc.resetQueries({ queryKey: ["me"] });
+      }),
+    [qc],
+  );
   return (
     <Routes>
       <Route path="/" element={<Landing />} />
@@ -362,10 +397,15 @@ export default function App() {
                       <button
                         aria-label="Sign out"
                         onClick={async () => {
-                          await api("/auth/logout", { method: "POST" });
-                          usePlayer.getState().reset();
-                          qc.clear();
-                          location.assign("/login");
+                          try {
+                            if (!me.data.offline)
+                              await api("/auth/logout", { method: "POST" });
+                          } finally {
+                            rememberAccount(null);
+                            usePlayer.getState().reset();
+                            qc.clear();
+                            location.assign("/login");
+                          }
                         }}
                       >
                         <LogOut size={17} />

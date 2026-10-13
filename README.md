@@ -18,7 +18,7 @@ ECHO is for people who want to discover music, keep their favourite songs togeth
 
 ## My solution
 
-Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Personal files can be imported into the browser's offline library. After preparing the app for offline use, those files can be played without a connection.
+Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Personal files can be imported into an offline library for the signed-in account. Other accounts using the same browser have separate libraries. After preparing the app for offline use, those files can be played without a connection.
 
 ## Main workflows
 
@@ -58,6 +58,8 @@ More details are in [architecture](docs/ARCHITECTURE.md) and [API documentation]
 ## Deployment
 
 The live app is at [echo-priya90909.onrender.com](https://echo-priya90909.onrender.com). It uses Render, MongoDB Atlas, Upstash Redis and private Supabase object storage. Render's free service can take longer to open after being inactive.
+
+Files imported before account separation was added need to be imported again while signed in. The older copies remain stored but are not assigned to an account automatically.
 
 Cloud playback needs an internet connection. Personal offline files are available only in the browser and device where they were imported. Clearing browser storage removes those copies.
 

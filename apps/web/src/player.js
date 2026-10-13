@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { api, json } from "./api.js";
 import { savedSong } from "./offline.js";
+import { offlineAccount, subscribeAccount } from "./offline-account.js";
 let localUrl = "";
 const audio = new Audio();
 audio.preload = "metadata";
@@ -20,6 +21,8 @@ export const usePlayer = create((set, get) => ({
     request++;
     audio.pause();
     audio.removeAttribute("src");
+    if (localUrl) URL.revokeObjectURL(localUrl);
+    localUrl = "";
     set({
       track: null,
       queue: [],
@@ -47,6 +50,17 @@ export const usePlayer = create((set, get) => ({
   play: async (queue, index = 0) => {
     const track = queue[index];
     if (!track) return;
+    const owner = offlineAccount()?._id;
+    if (
+      track._id.startsWith("local-") &&
+      (!owner || track.offlineOwner !== owner)
+    ) {
+      set({
+        error:
+          "This offline song belongs to a different account. Open your own offline library.",
+      });
+      return;
+    }
     const token = ++request;
     audio.pause();
     set({
@@ -59,9 +73,18 @@ export const usePlayer = create((set, get) => ({
       progress: 0,
     });
     try {
+      const isLocal = track._id.startsWith("local-");
+      if (isLocal && track.offlineOwner !== offlineAccount()?._id)
+        throw new Error(
+          "This offline song belongs to a different account. Open your own offline library.",
+        );
       const local = track._id.startsWith("local-")
         ? await savedSong(track._id)
         : undefined;
+      if (isLocal && !local)
+        throw new Error(
+          "This song is not saved in your account's offline library.",
+        );
       const { url } = local
         ? { url: URL.createObjectURL(local.audio) }
         : await api(`/tracks/${track._id}/playback`);
@@ -134,6 +157,7 @@ export const usePlayer = create((set, get) => ({
     }),
   setShuffle: () => set({ shuffle: !get().shuffle }),
 }));
+subscribeAccount(() => usePlayer.getState().reset());
 audio.addEventListener("timeupdate", () => {
   usePlayer.setState({ progress: audio.currentTime });
   if (!started && audio.currentTime >= Math.min(10, audio.duration / 2)) {

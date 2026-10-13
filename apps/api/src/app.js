@@ -46,8 +46,13 @@ app.get("/api/health", (_req, res) =>
       mongoose.connection.readyState === 1 ? "connected" : "unavailable",
   }),
 );
-app.get("/api/auth/csrf", (_req, res) => {
-  const token = randomBytes(32).toString("hex");
+app.get("/api/auth/csrf", (req, res) => {
+  const existing = req.cookies.echo_csrf;
+  const token =
+    typeof existing === "string" && /^[a-f\d]{64}$/.test(existing)
+      ? existing
+      : randomBytes(32).toString("hex");
+  res.set("Cache-Control", "no-store");
   res.cookie("echo_csrf", token, {
     secure: config.NODE_ENV === "production",
     sameSite: "lax",
