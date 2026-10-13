@@ -46,3 +46,15 @@ The manifest contains 48 recordings; the local verification cache contained 47. 
 - Browser verification: signed full-song playback and expanded-player controls passed. Offline import deduplicated the same file; app preparation succeeded. After all local test services stopped, the cached app reopened and played the saved file. Removing the test copy emptied the offline library.
 - Mobile verification at 390 × 844: no horizontal overflow; the bottom-player heart remained visible beside the queue control.
 - Known production/provider limits remain documented above. Google OAuth was not exercised without provider credentials; Docker images and a new hosted deployment were not built in this check.
+
+## Live app check — 13 October 2026
+
+The final JavaScript application was built into a Docker image and deployed to the existing free Render service. The frontend bundle on the live site matched the final local JavaScript build.
+
+- The GitHub repository, README, live app and public catalog were accessible without login cookies.
+- The live database health check passed and the catalog contained 47 full songs.
+- Login, signed audio playback with byte-range seeking, likes, private playlist creation and song persistence, MoodFlow and logout passed using a dedicated test account. Temporary test changes were cleaned up.
+- Browser playback showed Carefree's full 3:25 duration and advancing playback. Cover art, the expanded player and its heart/playlist controls loaded.
+- At 390px width, the page had no horizontal overflow and the mini-player heart was visible beside the queue.
+
+The earlier local offline and room checks still apply to this application code. Optional Google sign-in, multiple API instances and a full production security audit remain outside the completed checks. The demo video and submission form are separate submission tasks.
