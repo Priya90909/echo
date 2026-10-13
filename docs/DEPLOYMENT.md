@@ -1,0 +1,13 @@
+# Deployment preparation
+
+Use the supplied Dockerfiles or deploy API and worker as Node services. Host the built web directory `apps/web/dist` behind a reverse proxy. Rewrite browser routes to index.html; proxy `/api` and `/socket.io` to the API, including WebSocket upgrades. Keeping API and client on the same origin is required by this cookie and CSRF configuration. Set `WEB_ORIGIN` to the final HTTPS origin, `NODE_ENV=production`, and generate a new JWT secret. Do not deploy localhost MinIO defaults.
+
+MongoDB Atlas: create a dedicated project/database user with least-privilege read/write access to the echo database; allow only service egress IPs; use the supplied SRV connection string in MONGODB_URI. Ensure replica-set support, indexes, backups and retention. Integration tests must use a separate database named echo_test. Never run test cleanup on production.
+
+Redis: use a private authenticated Redis service with TLS (`rediss://`), persistence and eviction policy noeviction for queue correctness. Keep a single API instance until the Socket.IO Redis adapter and distributed presence are implemented. Size audio worker concurrency independently from API traffic.
+
+Object storage: create a private bucket. API requires PutObject for source objects and GetObject for playback signing; worker requires GetObject on sources and PutObject on processed audio. Grant only those prefixes. Configure CORS for the frontend origin and GET/HEAD, expose Accept-Ranges, Content-Range, Content-Length, and allow Range headers. Signed requests support seeking through standard S3 range behavior. `S3_PUBLIC_ENDPOINT` must be browser accessible and point to the same bucket. Do not rewrite signed URL hosts after signing. A CDN requires compatible signing/authorization configuration; no CDN deployment is claimed here.
+
+Worker image installs FFmpeg. Run as non-root with CPU/memory/time limits, private network egress, and temporary-disk quota. Monitor failed BullMQ jobs and clean abandoned source objects on a retention schedule. Configure upload proxy body limits >=50 MB and request timeouts appropriate to uploads.
+
+Before release: run live tests, verify browser audio range requests, multi-browser room synchronization, CSRF/cookie settings, rights review, report resolution, worker restart/retry behavior, backups and restore, secret rotation, TLS, dependency audit, logging with redaction, telemetry abuse resistance and accessibility. Add Google OAuth only with verified callbacks, state/PKCE, account linking rules and configured credentials. Add retention/deletion policies and a public support/moderation contact.

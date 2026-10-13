@@ -1,16 +1,30 @@
 {
   "name": "echo",
-  "version": "0.1.0",
   "private": true,
   "workspaces": [
-    "apps/*"
+    "apps/*",
+    "packages/*",
+    "workers/*"
   ],
   "scripts": {
     "dev": "concurrently -k -n api,web \"npm run dev -w @echo/api\" \"npm run dev -w @echo/web\"",
-    "build": "npm run build -w @echo/web",
-    "seed": "npm run seed -w @echo/api"
+    "build": "node scripts/check-source.mjs && npm run build -w @echo/web",
+    "test": "vitest run",
+    "seed": "npm run seed -w @echo/api",
+    "worker": "npm run dev -w @echo/audio-processor",
+    "test:integration": "node scripts/integration.mjs",
+    "dev:mongo": "node scripts/dev-mongo.mjs",
+    "format": "prettier --write apps packages workers tests e2e scripts docs *.json *.js *.md *.yml",
+    "format:check": "prettier --check apps packages workers tests e2e scripts docs *.json *.js *.md *.yml",
+    "dev:local": "node scripts/dev-local.mjs",
+    "catalog:import": "node apps/api/src/import-catalog.js"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "@playwright/test": "^1.56.0",
+    "concurrently": "^9.2.1",
+    "mongodb-memory-server": "^11.3.0",
+    "prettier": "^3.9.9",
+    "supertest": "^7.1.4",
+    "vitest": "^5.0.3"
   }
 }

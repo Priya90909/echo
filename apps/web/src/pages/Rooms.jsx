@@ -1,59 +1,309 @@
-import { useEffect, useRef, useState } from "react";
+import { useState, useEffect, useRef } from "react";
+import { useSearchParams } from "react-router-dom";
+import { Play } from "lucide-react";
+import { roomPosition } from "@echo/shared";
 import { io } from "socket.io-client";
-import { useSession } from "../session.jsx";
-import { usePlayer } from "../player.jsx";
-import { Link } from "react-router-dom";
-
-export default function Rooms() {
-  const { user } = useSession(), player = usePlayer();
-  const [room, setRoom] = useState(null), [code, setCode] = useState(""), [error, setError] = useState(""), [connected, setConnected] = useState(false), [busy, setBusy] = useState(false);
-  const socket = useRef(null), latest = useRef({ player, room });
-  latest.current = { player, room };
-  function receive(next) {
-    setRoom(next);
-    if (!next?.state || next.host === socket.current?.id) return;
-    const state = next.state;
-    const position = Math.min(state.track.duration, state.position + (state.playing ? Math.max(0, Date.now() - state.updatedAt) / 1000 : 0));
-    void latest.current.player.sync(state.track, position, state.playing);
-  }
+import { usePlayer } from "../player.js";
+import { useData } from "../components/Catalog.jsx";
+export default function Rooms({ user }) {
+  const [params, setParams] = useSearchParams();
+  const [code, setCode] = useState(params.get("code") ?? ""),
+    [socket, setSocket] = useState(),
+    [connected, setConnected] = useState(false),
+    [state, setState] = useState(),
+    [participants, setParticipants] = useState([]),
+    [messages, setMessages] = useState([]),
+    [text, setText] = useState(""),
+    [error, setError] = useState("");
+  const catalog = useData("/catalog");
+  const tracks = { ...catalog, data: catalog.data?.tracks };
+  const stateRef = useRef(null);
+  stateRef.current = state;
   useEffect(() => {
-    if (!user) return;
-    const client = io({ withCredentials: true }); socket.current = client;
-    client.on("connect", () => { setConnected(true); setError(""); });
-    client.on("connect_error", failure => setError(failure.message));
-    client.on("disconnect", () => { setConnected(false); setRoom(null); });
-    client.on("room:updated", receive);
-    return () => { client.disconnect(); socket.current = null; };
-  }, [user?._id]);
-  function publish() {
-    const { player: current, room: active } = latest.current;
-    if (!current.track || active?.host !== socket.current?.id) return;
-    socket.current.timeout(5000).emit("room:state", { track: current.track._id, position: current.progress, playing: current.playing }, (failure, result) => {
-      if (failure || result?.error) setError(result?.error || "Room synchronization timed out.");
+    const ended = () => {
+      const current = stateRef.current;
+      if (!current || current.host !== user?._id) return;
+      socket?.emit(
+        "control",
+        {
+          revision: current.revision,
+          position: 0,
+          index:
+            current.index < current.queue.length - 1
+              ? current.index + 1
+              : current.index,
+          playing: current.index < current.queue.length - 1,
+        },
+        (r) => {
+          if (!r.ok) setError(r.error);
+        },
+      );
+    };
+    window.addEventListener("echo:ended", ended);
+    return () => window.removeEventListener("echo:ended", ended);
+  }, [socket, user?._id]);
+  useEffect(() => {
+    const s = io({ withCredentials: true, autoConnect: false });
+    setSocket(s);
+    const sync = (payload) => {
+      setState(payload.state);
+      usePlayer.setState({ roomActive: true });
+      const remote = payload.state;
+      const track = tracks.data?.find(
+        (t) => t._id === remote.queue[remote.index],
+      );
+      const target = roomPosition(remote, payload.serverTime);
+      const p = usePlayer.getState();
+      if (track && p.track?._id !== track._id)
+        void p
+          .play(
+            remote.queue
+              .map((id) => tracks.data.find((t) => t._id === id))
+              .filter(Boolean),
+            remote.index,
+          )
+          .then(() => {
+            usePlayer.getState().seek(target);
+            if (!remote.playing && usePlayer.getState().playing)
+              usePlayer.getState().toggle();
+          });
+      else {
+        if (Math.abs(p.progress - target) > 1.5) p.seek(target);
+        if (p.playing !== remote.playing && p.track) p.toggle();
+      }
+    };
+    s.on("connect", () => {
+      setConnected(true);
+      const saved = params.get("code");
+      if (saved)
+        s.emit("join", { code: saved }, (r) =>
+          r.ok ? sync(r) : setError(r.error),
+        );
+    });
+    s.on("disconnect", () => setConnected(false));
+    s.on("closed", () => {
+      setState(undefined);
+      setParams({});
+      setError("This room was closed by a moderator.");
+    });
+    s.on("connect_error", (e) => setError(e.message));
+    s.on("state", sync);
+    s.on("participants", setParticipants);
+    s.on("chat", (m) => setMessages((old) => [...old.slice(-99), m]));
+    s.connect();
+    const timer = setInterval(() => {
+      if (s.connected && params.get("code")) {
+        const sentAt = Date.now();
+        s.emit("sync", {}, (r) => {
+          if (r.ok)
+            sync({
+              ...r,
+              serverTime: r.serverTime + (Date.now() - sentAt) / 2,
+            });
+        });
+      }
+    }, 5000);
+    return () => {
+      clearInterval(timer);
+      s.disconnect();
+      usePlayer.setState({ roomActive: false });
+    };
+  }, [tracks.data, params.get("code")]);
+  function command(event, data) {
+    socket?.emit(event, data, (r) => {
+      if (!r.ok) setError(r.error);
+      else {
+        setError("");
+        if (r.code) {
+          setCode(r.code);
+          setParams({ code: r.code });
+        }
+        if (r.state) setState(r.state);
+      }
     });
   }
-  useEffect(() => {
-    if (!room || room.host !== socket.current?.id) return;
-    publish(); const timer = setInterval(publish, 2000); return () => clearInterval(timer);
-  }, [room?.code, room?.host, player.track?._id, player.playing]);
-  function request(event, payload = {}) {
-    setBusy(true); setError("");
-    socket.current.timeout(5000).emit(event, payload, (failure, result) => {
-      setBusy(false);
-      if (failure || result?.error) setError(result?.error || "Room request timed out. Try again.");
-      else receive(result.room);
-    });
-  }
-  return <section className="page-section"><p className="eyebrow">SHARED MOMENTS</p><h1>EchoRooms</h1>
-    <p>Listen together. The host’s song, pause and playback position stay shared.</p>
-    {!user ? <Link to="/login">Sign in to join a room</Link> : <>
-      <p role="status">{connected ? "Connected" : "Connecting to rooms…"}</p>
-      {room ? <><h2>Room {room.code}</h2><p>Share this code with a friend. {room.host === socket.current?.id ? "You control playback using the player." : "The host controls shared playback. Press Play if your browser asks."}</p>
-        <ul>{room.members.map(member => <li key={member.id}>{member.name}{member.id === room.host ? " · Host" : ""}</li>)}</ul>
-        <button disabled={busy || !connected} onClick={() => request("room:leave")}>Leave room</button>
-      </> : <div className="room-entry"><button disabled={busy || !connected} onClick={() => request("room:create")}>Create a room</button>
-        <form onSubmit={event => { event.preventDefault(); request("room:join", { code: code.trim().toUpperCase() }); }}><label htmlFor="room-code">Room code</label><input id="room-code" value={code} onChange={event => setCode(event.target.value)} maxLength={6} pattern="[A-Fa-f0-9]{6}" required autoComplete="off" /><button disabled={busy || !connected}>Join room</button></form></div>}
-    </>}{error && <p role="alert">{error}</p>}
-    <p>Rooms close when everyone leaves. Leaving this page leaves the room.</p>
-  </section>;
+  const host = state?.host === user?._id;
+  return (
+    <main className="page">
+      <span className="eyebrow">SAME SOUND. SHARED MOMENT.</span>
+      <h1>Come together.</h1>
+      <p className={connected ? "connected" : "error"}>
+        {connected ? "● Connected" : "○ Connecting"}
+      </p>
+      {error && (
+        <p className="error" role="alert">
+          {error}
+        </p>
+      )}
+      <div className="inline-form">
+        <button
+          className="primary"
+          disabled={!connected}
+          onClick={() => command("create", {})}
+        >
+          Create a room
+        </button>
+        <input
+          aria-label="Room code"
+          placeholder="8-character room code"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+        />
+        <button
+          disabled={!connected || !code}
+          onClick={() => setParams({ code })}
+        >
+          Join room
+        </button>
+      </div>
+      {state && (
+        <div className="room-grid">
+          <section className="panel">
+            <h2>Room {code}</h2>
+            <button
+              onClick={() =>
+                void navigator.clipboard
+                  .writeText(location.href)
+                  .catch(() => setError("Copy the current browser address."))
+              }
+            >
+              Copy invitation
+            </button>
+            <button
+              onClick={() => {
+                setParams({});
+                setState(undefined);
+                setParticipants([]);
+              }}
+            >
+              Leave room
+            </button>
+            <button
+              onClick={() => {
+                const reason = prompt(
+                  "Describe the room issue (at least 10 characters)",
+                );
+                if (reason) command("report", { reason });
+              }}
+            >
+              Report room
+            </button>
+            <h3>Listening together</h3>
+            {participants.map((p) => (
+              <p key={p.id}>
+                {p.name}
+                {p.user === state.host ? " · host" : ""}
+              </p>
+            ))}
+            {host ? (
+              <>
+                <h3>Host controls</h3>
+                <button
+                  disabled={!tracks.data?.length}
+                  onClick={() =>
+                    command("control", {
+                      queue: tracks.data.map((t) => t._id),
+                      index: 0,
+                      position: 0,
+                      playing: true,
+                      revision: state.revision,
+                    })
+                  }
+                >
+                  Queue catalog
+                </button>
+                <button
+                  disabled={state.index >= state.queue.length - 1}
+                  onClick={() =>
+                    command("control", {
+                      index: state.index + 1,
+                      position: 0,
+                      playing: state.playing,
+                      revision: state.revision,
+                    })
+                  }
+                >
+                  Skip track
+                </button>
+                <select
+                  aria-label="Room track"
+                  value={state.queue[state.index] ?? ""}
+                  onChange={(e) =>
+                    command("control", {
+                      queue: [e.target.value],
+                      index: 0,
+                      position: 0,
+                      playing: true,
+                      revision: state.revision,
+                    })
+                  }
+                >
+                  <option value="">Choose a track</option>
+                  {tracks.data?.map((t) => (
+                    <option key={t._id} value={t._id}>
+                      {t.title}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  onClick={() =>
+                    command("control", {
+                      playing: !state.playing,
+                      revision: state.revision,
+                    })
+                  }
+                >
+                  {state.playing ? "Pause room" : "Play room"}
+                </button>
+                <button
+                  onClick={() =>
+                    command("control", {
+                      position: usePlayer.getState().progress,
+                      revision: state.revision,
+                    })
+                  }
+                >
+                  Sync to my position
+                </button>
+              </>
+            ) : (
+              <p>
+                The host controls room playback. Browser audio may need one
+                click on the player to begin.
+              </p>
+            )}
+          </section>
+          <section className="panel">
+            <h2>Room chat</h2>
+            <div className="chat" aria-live="polite">
+              {messages.map((m, i) => (
+                <p key={i}>
+                  <strong>{m.name}</strong>
+                  <br />
+                  {m.text}
+                </p>
+              ))}
+            </div>
+            <form
+              className="inline-form"
+              onSubmit={(e) => {
+                e.preventDefault();
+                command("chat", { text });
+                setText("");
+              }}
+            >
+              <input
+                aria-label="Chat message"
+                value={text}
+                maxLength={500}
+                onChange={(e) => setText(e.target.value)}
+              />
+              <button disabled={!text.trim()}>Send</button>
+            </form>
+            <p>Room reports reach the curator desk. Chat is ephemeral.</p>
+          </section>
+        </div>
+      )}
+    </main>
+  );
 }

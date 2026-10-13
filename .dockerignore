@@ -1,0 +1,11 @@
+node_modules
+**/dist
+.env
+.env.*
+!.env.example
+.git
+*.local.json
+.npm-cache
+work
+test-results
+playwright-report
