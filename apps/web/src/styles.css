@@ -135,6 +135,9 @@ small {
   flex-direction: column;
   z-index: 5;
 }
+.sidebar > * {
+  flex-shrink: 0;
+}
 .nav-label {
   font-size: 9px;
   letter-spacing: 1.6px;
@@ -1434,3 +1437,4 @@ small {
 .full-player-top .player-playlist-picker button:hover {
   background: #26382c;
 }
+
