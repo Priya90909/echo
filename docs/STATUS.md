@@ -68,3 +68,8 @@ Older files had no owner recorded. Their bytes remain in the legacy store, but t
 The CSRF endpoint now reuses a valid existing browser token and disables caching. The client shares token requests and retries a specifically rejected CSRF request once, while keeping origin and authorization checks enabled.
 
 Verification for the account separation fix: 30 standard tests and six MongoDB integration tests passed. The browser check imported and played a file in account A, confirmed account B had zero visible songs, switched back to A and restored the saved file, then stopped all local services and reopened/played it offline. The production build passed. CSRF tests cover stable tokens across tabs, one bounded recovery retry, and continued authorization/origin rejection.
+
+## Offline music temporarily disabled — 14 October 2026
+
+The current release removes Offline music from navigation and redirects /offline to Home. It retires the offline service worker and cached app pages, and requires the server to verify login. Previously imported audio files are preserved on the device. Earlier offline checks above describe historical versions, not an available feature in the current release. Online login, catalog, full-song playback, likes, playlists and MoodFlow passed live verification after deployment.
+
