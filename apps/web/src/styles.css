@@ -130,6 +130,11 @@ small {
   position: fixed;
   top: 0;
   bottom: 96px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #52685a transparent;
   padding: 34px 22px;
   display: flex;
   flex-direction: column;
@@ -1437,4 +1442,5 @@ small {
 .full-player-top .player-playlist-picker button:hover {
   background: #26382c;
 }
+
 
