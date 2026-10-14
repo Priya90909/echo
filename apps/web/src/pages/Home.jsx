@@ -76,18 +76,8 @@ export default function Home() {
           <p>Let MoodFlow follow your feeling.</p>
           <ArrowUpRight />
         </Link>
-        <Link to="/rooms" className="feature rooms">
-          <Users />
-          <span className="eyebrow">LISTEN TOGETHER</span>
-          <h2>
-            Different places.
-            <br />
-            Same frequency.
-          </h2>
-          <p>Bring your people into EchoRooms.</p>
-          <ArrowUpRight />
-        </Link>
       </section>
     </main>
   );
 }
+

@@ -1,6 +1,6 @@
 # ECHO
 
-ECHO is my end-term project: a music app where users can find songs, play them, save favourites and make playlists. I also added shared listening rooms.
+ECHO is my end-term project: a music app where users can find songs, play them, save favourites and make playlists.
 
 - **Student:** Priya Singh
 - **Live app:** [Open ECHO](https://echo-priya90909.onrender.com)
@@ -8,25 +8,24 @@ ECHO is my end-term project: a music app where users can find songs, play them, 
 
 ## Problem statement
 
-I wanted a music app where listening, saving songs and organising playlists feel connected. I also wanted users to be able to play their own audio files when they do not have internet access.
+I wanted a music app where listening, saving songs and organising playlists feel connected.
 
 The problem I focused on was bringing these everyday music tasks into one app, with saved account data and a player that keeps working while the user moves between pages.
 
 ## Target users
 
-ECHO is for people who want to discover music, keep their favourite songs together. It also has an Artist Studio for people who want to upload original music or music they have permission to share.
+ECHO is for people who want to discover music and keep their favourite songs together. It also has an Artist Studio for people who want to upload original music or music they have permission to share.
 
 ## My solution
 
-Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Offline music is temporarily disabled.
+Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Offline music and EchoRooms are temporarily disabled.
 
 ## Main workflows
 
 1. **Discover and listen:** browse or search songs, play a track, seek through it and use the queue.
 2. **Save music:** sign in, like a song, create a playlist and add songs to it.
 3. **Make playlists:** collect songs into your own playlists.
-4. **Listen together:** create or join an EchoRoom and follow the host's playback.
-5. **Share original music:** create an artist profile, upload a permitted audio file and wait for processing and review.
+4. **Share original music:** create an artist profile, upload a permitted audio file and wait for processing and review.
 
 ## Tech stack
 
@@ -39,7 +38,6 @@ I used JavaScript and JSX throughout the repository.
 | Backend          | Node.js, Express, Zod                            | API routes and input validation                         |
 | Database         | MongoDB, Mongoose                                | Accounts, songs, likes, playlists and listening history |
 | Authentication   | bcrypt, JWT cookies, CSRF checks                 | Password hashing and protected account actions          |
-| Shared rooms     | Socket.IO, Redis                                 | Room state, chat and playback updates                   |
 | Audio processing | BullMQ, FFmpeg, ffprobe                          | Background processing of uploaded audio                 |
 | Media storage    | S3-compatible object storage                     | Audio files, cover images and signed playback links     |
 | Testing          | Vitest, integration tests, Playwright test files | Checks for application behaviour                        |
@@ -50,7 +48,7 @@ The React app talks to the Express API. The API reads and saves data in MongoDB.
 
 For uploads, the API adds a job to BullMQ. The audio worker processes the file with FFmpeg and updates its status. Uploaded songs need processing and approval before they appear in the public catalog.
 
-Socket.IO sends room updates, while Redis stores the shared room state.
+Redis supports the background audio processing queue. EchoRooms code is retained from an earlier stage but is not available in the current app.
 
 More details are in [architecture](docs/ARCHITECTURE.md) and [API documentation](docs/API.md).
 
@@ -58,7 +56,6 @@ More details are in [architecture](docs/ARCHITECTURE.md) and [API documentation]
 
 The live app is at [echo-priya90909.onrender.com](https://echo-priya90909.onrender.com). It uses Render, MongoDB Atlas, Upstash Redis and private Supabase object storage. Render's free service can take longer to open after being inactive.
 
-Files imported before account separation was added need to be imported again while signed in. The older copies remain stored but are not assigned to an account automatically.
 
 Music playback needs an internet connection. Offline music is temporarily disabled; previously imported files have not been deleted.
 
@@ -111,7 +108,7 @@ npx playwright test
 
 `test:integration` starts a real temporary MongoDB replica set, downloads a MongoDB binary on first use, runs persistence tests, and shuts it down. It does not replace production MongoDB with mocks. `npm test` skips database integration unless `TEST_MONGODB_URI` is configured. The supplied integration suite deliberately drops the named `echo_test` database; never point it at real data.
 
-For a Windows development environment without Docker, `npm run dev:mongo` starts a temporary real MongoDB replica set on port 27017. Data is ephemeral, so use Docker volumes or MongoDB Atlas for persistent development. Redis, object storage, and FFmpeg are still required for audio processing and rooms. Missing services cause explicit errors rather than simulated success.
+For a Windows development environment without Docker, `npm run dev:mongo` starts a temporary real MongoDB replica set on port 27017. Data is ephemeral, so use Docker volumes or MongoDB Atlas for persistent development. Redis, object storage, and FFmpeg are still required for audio processing. Missing services cause explicit errors rather than simulated success.
 
 ## Docker-free local development
 
@@ -162,12 +159,13 @@ The earlier commits preserve the build stages. This list records how I built the
 8. Queue and expanded player
 9. Likes and personal playlists
 10. Listening history and MoodFlow
-11. Shared listening rooms
+11. Shared listening rooms (built earlier; temporarily disabled in the current release)
 12. Artist uploads, validated storage and FFmpeg processing worker
 13. Personal offline file library and app caching (built earlier; temporarily disabled in the current release)
 14. Licensed full-song manifest, importer, artwork and cache restore
 15. Settings, administration, optional Google OAuth, responsive UI, tests and release documentation
 
 All application source and test files use JavaScript/JSX. `npm run build` validates JavaScript syntax and relative imports, then builds the frontend. The API and worker execute their source directly with Node.
+
 
 

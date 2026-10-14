@@ -9,7 +9,6 @@ const MoodFlow = lazy(() => import("./pages/MoodFlow.jsx"));
 const Studio = lazy(() => import("./pages/Studio.jsx"));
 const Settings = lazy(() => import("./pages/Settings.jsx"));
 const Admin = lazy(() => import("./pages/Admin.jsx"));
-const Rooms = lazy(() => import("./pages/Rooms.jsx"));
 function Protected({ user, children }) {
   return user ? (
     <>{children}</>
@@ -38,7 +37,7 @@ export default function Pages({ user }) {
         <Route path="/likes" element={protect(<Collection />)} />
         <Route path="/history" element={protect(<Collection history />)} />
         <Route path="/moodflow" element={protect(<MoodFlow />)} />
-        <Route path="/rooms" element={protect(<Rooms user={user} />)} />
+        <Route path="/rooms" element={<Navigate to="/home" replace />} />
         <Route path="/studio" element={protect(<Studio />)} />
         <Route path="/studio/upload" element={protect(<Studio uploadOnly />)} />
         <Route
@@ -78,5 +77,6 @@ export default function Pages({ user }) {
     </Suspense>
   );
 }
+
 
 

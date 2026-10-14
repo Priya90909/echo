@@ -73,3 +73,8 @@ Verification for the account separation fix: 30 standard tests and six MongoDB i
 
 The current release removes Offline music from navigation and redirects /offline to Home. It retires the offline service worker and cached app pages, and requires the server to verify login. Previously imported audio files are preserved on the device. Earlier offline checks above describe historical versions, not an available feature in the current release. Online login, catalog, full-song playback, likes, playlists and MoodFlow passed live verification after deployment.
 
+
+## EchoRooms temporarily disabled — 14 October 2026
+
+EchoRooms has been removed from navigation and the home page. /rooms redirects to Home. Earlier room verification describes historical versions; shared listening is not available in the current release.
+

@@ -39,7 +39,6 @@ const links = [
   ["/likes", "Liked songs", Heart],
   ["/history", "Listening history", History],
   ["/moodflow", "MoodFlow", Radio],
-  ["/rooms", "EchoRooms", Users],
   ["/studio", "Artist Studio", Mic2],
 ];
 import { time } from "./format.js";
@@ -427,5 +426,6 @@ export default function App() {
     </Routes>
   );
 }
+
 
 
