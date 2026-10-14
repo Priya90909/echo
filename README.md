@@ -1,6 +1,6 @@
 # ECHO
 
-ECHO is my end-term project: a music app where users can find songs, play them, save favourites and make playlists. I also added a personal offline library and shared listening rooms.
+ECHO is my end-term project: a music app where users can find songs, play them, save favourites and make playlists. I also added shared listening rooms.
 
 - **Student:** Priya Singh
 - **Live app:** [Open ECHO](https://echo-priya90909.onrender.com)
@@ -14,17 +14,17 @@ The problem I focused on was bringing these everyday music tasks into one app, w
 
 ## Target users
 
-ECHO is for people who want to discover music, keep their favourite songs together and listen to their personal audio files offline. It also has an Artist Studio for people who want to upload original music or music they have permission to share.
+ECHO is for people who want to discover music, keep their favourite songs together. It also has an Artist Studio for people who want to upload original music or music they have permission to share.
 
 ## My solution
 
-Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Personal files can be imported into an offline library for the signed-in account. Other accounts using the same browser have separate libraries. After preparing the app for offline use, those files can be played without a connection.
+Users can browse or search the catalog and play a song in ECHO's own player. They can like songs and add them to playlists. Offline music is temporarily disabled.
 
 ## Main workflows
 
 1. **Discover and listen:** browse or search songs, play a track, seek through it and use the queue.
 2. **Save music:** sign in, like a song, create a playlist and add songs to it.
-3. **Listen offline:** import a personal audio file, prepare the app, then reopen it and play the file offline.
+3. **Make playlists:** collect songs into your own playlists.
 4. **Listen together:** create or join an EchoRoom and follow the host's playback.
 5. **Share original music:** create an artist profile, upload a permitted audio file and wait for processing and review.
 
@@ -42,7 +42,6 @@ I used JavaScript and JSX throughout the repository.
 | Shared rooms     | Socket.IO, Redis                                 | Room state, chat and playback updates                   |
 | Audio processing | BullMQ, FFmpeg, ffprobe                          | Background processing of uploaded audio                 |
 | Media storage    | S3-compatible object storage                     | Audio files, cover images and signed playback links     |
-| Offline support  | IndexedDB, service worker                        | Personal audio files and cached app pages               |
 | Testing          | Vitest, integration tests, Playwright test files | Checks for application behaviour                        |
 
 ## Architecture
@@ -51,7 +50,7 @@ The React app talks to the Express API. The API reads and saves data in MongoDB.
 
 For uploads, the API adds a job to BullMQ. The audio worker processes the file with FFmpeg and updates its status. Uploaded songs need processing and approval before they appear in the public catalog.
 
-Socket.IO sends room updates, while Redis stores the shared room state. Offline files stay in IndexedDB on the user's device and play through the same player.
+Socket.IO sends room updates, while Redis stores the shared room state.
 
 More details are in [architecture](docs/ARCHITECTURE.md) and [API documentation](docs/API.md).
 
@@ -61,13 +60,13 @@ The live app is at [echo-priya90909.onrender.com](https://echo-priya90909.onrend
 
 Files imported before account separation was added need to be imported again while signed in. The older copies remain stored but are not assigned to an account automatically.
 
-Cloud playback needs an internet connection. Personal offline files are available only in the browser and device where they were imported. Clearing browser storage removes those copies.
+Music playback needs an internet connection. Offline music is temporarily disabled; previously imported files have not been deleted.
 
 ## Music and project scope
 
 The licensed catalog importer has a manifest for 48 Kevin MacLeod recordings with CC BY 4.0 attribution and original ECHO artwork. The local release check used the 47 recordings available in the cache. Downloaded audio is not included in GitHub. See [catalog credits](docs/CATALOG.md).
 
-The app does not import or download commercial Spotify songs or directly stream a Google Drive playlist. Offline music uses files the user already has permission to use.
+The app does not import or download commercial Spotify songs or directly stream a Google Drive playlist. 
 
 This is a student project. I focused on getting the main workflows working. Optional Google sign-in needs provider credentials, and features such as password recovery and running multiple API instances are future work. Verified checks and limitations are listed in [project status](docs/STATUS.md).
 
@@ -170,3 +169,4 @@ The earlier commits preserve stages 1–11. The final integration completes the 
 15. Settings, administration, optional Google OAuth, responsive UI, tests and release documentation
 
 All application source and test files use JavaScript/JSX. `npm run build` validates JavaScript syntax and relative imports, then builds the frontend. The API and worker execute their source directly with Node.
+

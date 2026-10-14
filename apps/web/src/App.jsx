@@ -26,7 +26,6 @@ import {
 import { api, json } from "./api.js";
 import { usePlayer } from "./player.js";
 import {
-  offlineAccount,
   rememberAccount,
   subscribeAccount,
 } from "./offline-account.js";
@@ -37,7 +36,6 @@ const links = [
   ["/home", "Discover", Home],
   ["/search", "Search", Search],
   ["/library", "Your library", Library],
-  ["/offline", "Offline music", Library],
   ["/likes", "Liked songs", Heart],
   ["/history", "Listening history", History],
   ["/moodflow", "MoodFlow", Radio],
@@ -324,9 +322,6 @@ export default function App() {
         return user;
       } catch (error) {
         if (error.status === 401) rememberAccount(null);
-        const cached = offlineAccount();
-        if (cached && error instanceof TypeError)
-          return { ...cached, offline: true };
         throw error;
       }
     },
@@ -432,3 +427,5 @@ export default function App() {
     </Routes>
   );
 }
+
+

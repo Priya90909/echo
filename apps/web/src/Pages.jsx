@@ -1,7 +1,6 @@
 import { lazy, Suspense } from "react";
-import { Link, Routes, Route } from "react-router-dom";
+import { Link, Routes, Route, Navigate } from "react-router-dom";
 const Home = lazy(() => import("./pages/Home.jsx"));
-const Offline = lazy(() => import("./pages/Offline.jsx"));
 const Search = lazy(() => import("./pages/Search.jsx"));
 const Library = lazy(() => import("./pages/Library.jsx"));
 const Detail = lazy(() => import("./pages/Detail.jsx"));
@@ -32,7 +31,7 @@ export default function Pages({ user }) {
         <Route path="/home" element={<Home />} />
         <Route
           path="/offline"
-          element={<Offline key={user?._id || "signed-out"} user={user} />}
+          element={<Navigate to="/home" replace />}
         />
         <Route path="/search" element={<Search />} />
         <Route path="/library" element={protect(<Library />)} />
@@ -79,3 +78,5 @@ export default function Pages({ user }) {
     </Suspense>
   );
 }
+
+
