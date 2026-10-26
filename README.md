@@ -67,10 +67,6 @@ The app does not import or download commercial Spotify songs or directly stream 
 
 This is a student project. I focused on getting the main workflows working. Optional Google sign-in needs provider credentials, and features such as password recovery and running multiple API instances are future work. Verified checks and limitations are listed in [project status](docs/STATUS.md).
 
-## Development and AI assistance
-
-I used AI assistance for code generation, debugging, refactoring, documentation and testing. The repository includes the resulting application code and tests. Open-source libraries are listed in the package files, and third-party music is credited separately.
-
 ## Start locally
 
 Requirements: Node 24+ and Docker Compose for the standard infrastructure. The worker includes portable FFmpeg/ffprobe binaries; FFMPEG_PATH and FFPROBE_PATH can override them. Run commands from this directory.
