@@ -25,10 +25,7 @@ import {
 } from "lucide-react";
 import { api, json } from "./api.js";
 import { usePlayer } from "./player.js";
-import {
-  rememberAccount,
-  subscribeAccount,
-} from "./offline-account.js";
+import { rememberAccount, subscribeAccount } from "./offline-account.js";
 import PlayerLike from "./components/PlayerLike.jsx";
 const Pages = lazy(() => import("./Pages.jsx"));
 const FullPlayer = lazy(() => import("./components/FullPlayer.jsx"));
@@ -306,7 +303,7 @@ function Landing() {
       </div>
       <div className="landing-foot">
         <span>01 / DISCOVER YOUR SOUND</span>
-        <span>MOODFLOW · ECHOROOMS · ARTIST STUDIO</span>
+        <span>MOODFLOW · PLAYLISTS · ARTIST STUDIO</span>
       </div>
     </main>
   );
@@ -426,6 +423,3 @@ export default function App() {
     </Routes>
   );
 }
-
-
-

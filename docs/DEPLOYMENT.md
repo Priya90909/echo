@@ -1,6 +1,10 @@
+# Current Render deployment
+
+The root `Dockerfile` builds the frontend and API into one image. `deploy-build.mjs` configures same-origin frontend serving, the trusted Render proxy and storage CSP; `deploy-start.mjs` starts the API and, when `ECHO_RUN_WORKER=true`, the audio worker. These files contain no credentials. Set the documented environment variables in Render and set `ECHO_RUN_WORKER=true` for uploads. Build from the repository root. The hosted free instance can sleep, so upload processing resumes when it wakes.
+
 # Deployment preparation
 
-Use the supplied Dockerfiles or deploy API and worker as Node services. Host the built web directory `apps/web/dist` behind a reverse proxy. Rewrite browser routes to index.html; proxy `/api` and `/socket.io` to the API, including WebSocket upgrades. Keeping API and client on the same origin is required by this cookie and CSRF configuration. Set `WEB_ORIGIN` to the final HTTPS origin, `NODE_ENV=production`, and generate a new JWT secret. Do not deploy localhost MinIO defaults.
+Use the supplied Dockerfiles or deploy API and worker as Node services. Host the built web directory `apps/web/dist` behind a reverse proxy. Rewrite browser routes to index.html; proxy `/api` to the API. The disabled room implementation also uses `/socket.io`; it is not part of the current listener workflow. Keeping API and client on the same origin is required by this cookie and CSRF configuration. Set `WEB_ORIGIN` to the final HTTPS origin, `NODE_ENV=production`, and generate a new JWT secret. Do not deploy localhost MinIO defaults.
 
 MongoDB Atlas: create a dedicated project/database user with least-privilege read/write access to the echo database; allow only service egress IPs; use the supplied SRV connection string in MONGODB_URI. Ensure replica-set support, indexes, backups and retention. Integration tests must use a separate database named echo_test. Never run test cleanup on production.
 
@@ -10,4 +14,4 @@ Object storage: create a private bucket. API requires PutObject for source objec
 
 Worker image installs FFmpeg. Run as non-root with CPU/memory/time limits, private network egress, and temporary-disk quota. Monitor failed BullMQ jobs and clean abandoned source objects on a retention schedule. Configure upload proxy body limits >=50 MB and request timeouts appropriate to uploads.
 
-Before release: run live tests, verify browser audio range requests, multi-browser room synchronization, CSRF/cookie settings, rights review, report resolution, worker restart/retry behavior, backups and restore, secret rotation, TLS, dependency audit, logging with redaction, telemetry abuse resistance and accessibility. Add Google OAuth only with verified callbacks, state/PKCE, account linking rules and configured credentials. Add retention/deletion policies and a public support/moderation contact.
+Before release: run live tests, verify browser audio range requests, CSRF/cookie settings, rights review, report resolution, worker restart/retry behavior, backups and restore, secret rotation, TLS, dependency audit, logging with redaction, telemetry abuse resistance and accessibility. Add Google OAuth only with verified callbacks, state/PKCE, account linking rules and configured credentials. Add retention/deletion policies and a public support/moderation contact.

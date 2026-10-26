@@ -1,6 +1,6 @@
 # Implementation status
 
-This is a runnable development release implementing the core of phases 1–5, with deployment scaffolding and initial verification for phase 6. It is not yet a production launch or a finished commercial music service.
+This is a deployed student project. The current listener workflows are registration/login, discovery/search, full-song playback, likes/playlists, listening history and MoodFlow. Artist uploads are processed and held for curator review. Offline music and EchoRooms are disabled. Historical phase notes below describe the build process; current verification is recorded at the end.
 
 ## Phase 1 — foundation
 
@@ -73,8 +73,15 @@ Verification for the account separation fix: 30 standard tests and six MongoDB i
 
 The current release removes Offline music from navigation and redirects /offline to Home. It retires the offline service worker and cached app pages, and requires the server to verify login. Previously imported audio files are preserved on the device. Earlier offline checks above describe historical versions, not an available feature in the current release. Online login, catalog, full-song playback, likes, playlists and MoodFlow passed live verification after deployment.
 
-
 ## EchoRooms temporarily disabled — 14 October 2026
 
 EchoRooms has been removed from navigation and the home page. /rooms redirects to Home. Earlier room verification describes historical versions; shared listening is not available in the current release.
 
+## Submission readiness — 26 October 2026
+
+- Live checks passed for database health, 47-song catalog, login/logout, signed range playback, likes, playlist persistence and MoodFlow.
+- Live Artist Studio accepted a generated WAV, processed it with FFmpeg, held it for review and returned artist analytics. The synthetic verification track was left unpublished. No commercial catalog content was changed.
+- Seven isolated MongoDB integration tests passed, including registration, ownership/privacy, playlists, logout and curator publication checks. Publication rejects non-admins, missing processed media and unconfirmed rights; unpublishing blocks new playback URLs. Curator publication was tested in the isolated database, not by publishing test audio to the live catalog.
+- The standard suite previously passed 30 checks; integration checks are run separately and must never target production.
+- The README provides a demo preview plus a direct MP4 download. Anonymous range requests returned HTTP 206 with video/mp4. Signed-out Drive preview remains browser-dependent; the download is the verified fallback.
+- The submission form is a draft for the student to review and submit. No evaluation grade, originality certification or full security audit is claimed.

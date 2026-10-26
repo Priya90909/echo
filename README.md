@@ -5,7 +5,9 @@ ECHO is my end-term project: a music app where users can find songs, play them, 
 - **Student:** Priya Singh
 - **Live app:** [Open ECHO](https://echo-priya90909.onrender.com)
 - **Source code:** [GitHub repository](https://github.com/Priya90909/echo)
-- **Demo video:** [Watch the ECHO demo](https://drive.google.com/file/d/1bnK1apKD7ci2LUYdeU9pO39FY7GWAiRS/view?usp=sharing)
+- **Demo video:** [Watch the ECHO demo](https://drive.google.com/file/d/1bnK1apKD7ci2LUYdeU9pO39FY7GWAiRS/view?usp=sharing) · [Download MP4 without signing in](https://drive.usercontent.google.com/download?id=1bnK1apKD7ci2LUYdeU9pO39FY7GWAiRS&export=download&confirm=t)
+
+If Drive cannot preview the video, use the download link and open the MP4 in a video player.
 
 ## Problem statement
 
@@ -25,7 +27,7 @@ Users can browse or search the catalog and play a song in ECHO's own player. The
 
 1. **Discover and listen:** browse or search songs, play a track, seek through it and use the queue.
 2. **Save music:** sign in, like a song, create a playlist and add songs to it.
-3. **Make playlists:** collect songs into your own playlists.
+3. **Rediscover music:** review listening history and explore mood-based recommendations.
 4. **Share original music:** create an artist profile, upload a permitted audio file and wait for processing and review.
 
 ## Tech stack
@@ -57,14 +59,13 @@ More details are in [architecture](docs/ARCHITECTURE.md) and [API documentation]
 
 The live app is at [echo-priya90909.onrender.com](https://echo-priya90909.onrender.com). It uses Render, MongoDB Atlas, Upstash Redis and private Supabase object storage. Render's free service can take longer to open after being inactive.
 
-
 Music playback needs an internet connection. Offline music is temporarily disabled; previously imported files have not been deleted.
 
 ## Music and project scope
 
 The licensed catalog importer has a manifest for 48 Kevin MacLeod recordings with CC BY 4.0 attribution and original ECHO artwork. The local release check used the 47 recordings available in the cache. Downloaded audio is not included in GitHub. See [catalog credits](docs/CATALOG.md).
 
-The app does not import or download commercial Spotify songs or directly stream a Google Drive playlist. 
+The app does not import or download commercial Spotify songs or directly stream a Google Drive playlist.
 
 This is a student project. I focused on getting the main workflows working. Optional Google sign-in needs provider credentials, and features such as password recovery and running multiple API instances are future work. Verified checks and limitations are listed in [project status](docs/STATUS.md).
 
@@ -99,7 +100,6 @@ npx playwright install chromium
 npx playwright test
 # With all services running and catalog seeded:
 $env:ECHO_E2E_LIVE='1'
-$env:ECHO_E2E_ROOMS='1'
 npx playwright test
 ```
 
@@ -163,7 +163,3 @@ The earlier commits preserve the build stages. This list records how I built the
 15. Settings, administration, optional Google OAuth, responsive UI, tests and release documentation
 
 All application source and test files use JavaScript/JSX. `npm run build` validates JavaScript syntax and relative imports, then builds the frontend. The API and worker execute their source directly with Node.
-
-
-
-

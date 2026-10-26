@@ -20,7 +20,9 @@ Uploaded MIME headers are not trusted. Signature inspection is a first check; FF
 
 Score = 50 for mood compatibility + 20 for liked genre + 15 for followed artist + 10 for liked track − 5 for recent play. Equal scores break by stable track ID. Each contribution produces a human-readable reason. Cold start uses mood compatibility alone. No paid AI or random ranking. Current candidates are capped at 1,000; production should select candidates with indexed queries and add cached result invalidation.
 
-## Rooms
+## Rooms (disabled in the current release)
+
+The room page and entry points are disabled; `/rooms` redirects to Home. The following describes retained historical code, not an available product workflow.
 
 Redis holds queue, index, host, position, playing flag, update timestamp and revision for 24 hours. State changes require the host, current revision and a Redis lock with token-checked release. The server checks that queue items are published. Socket.IO delivers authoritative state, participants and ephemeral chat. Client computes elapsed playback from server time and corrects drift over 1.5 seconds, polls every five seconds and rejoins via URL invite after reconnect. Room cap: 20 sockets; chat: five messages per ten seconds. Browser autoplay policy still requires a user gesture in some browsers. This initial implementation is single API instance; multiple instances require Socket.IO Redis adapter, distributed presence and measured round-trip clock offsets.
 

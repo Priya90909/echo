@@ -167,6 +167,60 @@ describe.skipIf(!enabled)(
         .attach("audio", Buffer.from("not audio"), "fake.mp3");
       expect(res.status).toBe(400);
     });
+    it("keeps review tracks private and requires curator approval with processed media and rights", async () => {
+      const review = await M.Track.create({
+        title: "Approval verification",
+        artist: artistId,
+        genre: "Ambient",
+        license: "original",
+        status: "review",
+        rightsConfirmed: false,
+      });
+      const path = `/api/admin/tracks/${review._id}`;
+      expect(
+        (await post(bob, path, csrfB, { status: "published" }, "patch")).status,
+      ).toBe(403);
+      expect(
+        (await alice.get(`/api/tracks/${review._id}/playback`)).status,
+      ).toBe(404);
+      await M.User.updateOne({ email: "bob@echo.test" }, { role: "admin" });
+      try {
+        expect(
+          (await post(bob, path, csrfB, { status: "published" }, "patch"))
+            .status,
+        ).toBe(400);
+        await M.Track.updateOne(
+          { _id: review._id },
+          { mediaKey: "verification.mp3" },
+        );
+        expect(
+          (await post(bob, path, csrfB, { status: "published" }, "patch"))
+            .status,
+        ).toBe(400);
+        await M.Track.updateOne({ _id: review._id }, { rightsConfirmed: true });
+        expect(
+          (await post(bob, path, csrfB, { status: "published" }, "patch"))
+            .status,
+        ).toBe(200);
+        expect(
+          (
+            await alice.get("/api/search?q=Approval%20verification")
+          ).body.tracks.some((track) => track._id === String(review._id)),
+        ).toBe(true);
+        expect(
+          (await alice.get(`/api/tracks/${review._id}/playback`)).status,
+        ).toBe(200);
+        expect(
+          (await post(bob, path, csrfB, { status: "unpublished" }, "patch"))
+            .status,
+        ).toBe(200);
+        expect(
+          (await alice.get(`/api/tracks/${review._id}/playback`)).status,
+        ).toBe(404);
+      } finally {
+        await M.User.updateOne({ email: "bob@echo.test" }, { role: "artist" });
+      }
+    });
     it("rejects admin escalation and invalidates sessions on logout", async () => {
       expect((await alice.get("/api/admin")).status).toBe(403);
       expect((await post(alice, "/api/auth/logout", csrfA, {})).status).toBe(

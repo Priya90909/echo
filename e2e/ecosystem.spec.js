@@ -15,7 +15,7 @@ async function register(page, name) {
 test("two listeners synchronize playback, chat and rejoin", async ({
   browser,
 }) => {
-  test.skip(!process.env.ECHO_E2E_ROOMS, "Requires Redis");
+  test.skip(true, "EchoRooms is disabled in the current release");
   const contextA = await browser.newContext(),
     contextB = await browser.newContext();
   const a = await contextA.newPage(),
@@ -53,7 +53,10 @@ test("two listeners synchronize playback, chat and rejoin", async ({
 test("artist upload is processed by FFmpeg and awaits approval", async ({
   page,
 }) => {
-  test.skip(!process.env.ECHO_E2E_ROOMS, "Requires Redis and worker");
+  test.skip(
+    !process.env.ECHO_E2E_LIVE,
+    "Requires API, Redis, storage and worker",
+  );
   test.setTimeout(60000);
   await register(page, "Upload Artist");
   await page.goto("/studio");
