@@ -5,6 +5,7 @@ ECHO is my end-term project: a music app where users can find songs, play them, 
 - **Student:** Priya Singh
 - **Live app:** [Open ECHO](https://echo-priya90909.onrender.com)
 - **Source code:** [GitHub repository](https://github.com/Priya90909/echo)
+- **Demo video:** [Watch the ECHO demo](https://drive.google.com/file/d/1bnK1apKD7ci2LUYdeU9pO39FY7GWAiRS/view?usp=sharing)
 
 ## Problem statement
 
@@ -162,6 +163,7 @@ The earlier commits preserve the build stages. This list records how I built the
 15. Settings, administration, optional Google OAuth, responsive UI, tests and release documentation
 
 All application source and test files use JavaScript/JSX. `npm run build` validates JavaScript syntax and relative imports, then builds the frontend. The API and worker execute their source directly with Node.
+
 
 
 
