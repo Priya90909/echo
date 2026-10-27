@@ -141,25 +141,3 @@ The portable Redis binary comes from the [community Windows Redis release](https
 Keep `.env` untracked. Generate a random JWT secret before starting the API. Rotate all local defaults before deploying. Google OAuth is optional and appears only when GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET and GOOGLE_CALLBACK_URL are configured. Email/password authentication works without OAuth credentials.
 
 See [architecture](docs/ARCHITECTURE.md), [API](docs/API.md), [deployment](docs/DEPLOYMENT.md), and [implementation status](docs/STATUS.md).
-
-## Build stages
-
-The earlier commits preserve the build stages. This list records how I built the project; offline music from stage 13 is currently disabled. The application uses JavaScript:
-
-1. Project foundation
-2. Visual shell and navigation
-3. API and database foundation
-4. Registration and sign-in
-5. Song catalog and discovery
-6. Search and detail pages
-7. Native audio playback
-8. Queue and expanded player
-9. Likes and personal playlists
-10. Listening history and MoodFlow
-11. Shared listening rooms (built earlier; temporarily disabled in the current release)
-12. Artist uploads, validated storage and FFmpeg processing worker
-13. Personal offline file library and app caching (built earlier; temporarily disabled in the current release)
-14. Licensed full-song manifest, importer, artwork and cache restore
-15. Settings, administration, optional Google OAuth, responsive UI, tests and release documentation
-
-All application source and test files use JavaScript/JSX. `npm run build` validates JavaScript syntax and relative imports, then builds the frontend. The API and worker execute their source directly with Node.
